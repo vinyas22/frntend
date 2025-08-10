@@ -1,0 +1,50 @@
+<div class="max-w-lg mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-100 dark:border-gray-700 mt-6">
+  <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Create Monthly Salary</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+
+    <!-- Title Input -->
+    <div class="mb-4">
+      <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">Title</label>
+      <input
+        type="text"
+        formControlName="title"
+        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        placeholder="E.g. July Salary"
+      />
+    </div>
+
+    <!-- Total Balance -->
+    <div class="mb-4">
+      <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">Total Balance</label>
+      <input
+        type="number"
+        formControlName="total_balance"
+        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      />
+    </div>
+
+    <!-- Bill Month -->
+    <div class="mb-4">
+      <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">Bill Month</label>
+      <input
+        type="month"
+        formControlName="bill_month"
+        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+      />
+    </div>
+
+    <!-- Error message -->
+    <div *ngIf="error" class="text-red-600 dark:text-red-400 mb-2 text-sm">
+      {{ error }}
+    </div>
+
+    <!-- Submit -->
+    <button
+      type="submit"
+      class="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white px-4 py-2 rounded shadow font-semibold transition"
+      [disabled]="submitting"
+    >
+      {{ submitting ? "Creating..." : "Create Salary" }}
+    </button>
+  </form>
+</div>

@@ -1,0 +1,228 @@
+<div class="mx-auto max-w-5xl px-4 py-8 transition-all duration-300">
+
+  <!-- Header -->
+  <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Yearly Report</h1>
+      <p class="text-gray-600 dark:text-gray-400">Track your annual income, expenses, savings, and trends</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <label for="year-select" class="font-medium text-gray-600 dark:text-gray-400 mr-2">Year:</label>
+      <select
+        id="year-select"
+        [(ngModel)]="selectedYear"
+        (change)="onYearChange()"
+        [disabled]="isLoadingYears"
+        class="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 bg-white dark:bg-gray-800 text-base text-gray-900 dark:text-white transition"
+      >
+        <option value="">Select a year...</option>
+        <option *ngFor="let y of yearOptions || []" [value]="y.value">{{ y.label }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading States -->
+  <div *ngIf="isLoadingYears" class="flex items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-20 w-20 border-b-2 border-blue-600 mr-4"></div>
+    <p class="text-lg text-blue-600 font-medium">Loading available years...</p>
+  </div>
+  <div *ngIf="isLoading" class="flex items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-20 w-20 border-b-2 border-indigo-700 mr-4"></div>
+    <p class="text-lg text-indigo-700 font-medium">Loading yearly report...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+    <div class="flex items-start">
+      <span class="text-red-400 mr-2">⚠️</span>
+      <span>{{errorMessage}}</span>
+    </div>
+  </div>
+
+  <!-- No Data State -->
+  <div *ngIf="!isLoadingYears && (yearOptions?.length ?? 0) === 0 && !errorMessage" class="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-100 dark:border-gray-800 p-8 flex flex-col items-center my-8">
+    <span class="text-5xl mb-4">📊</span>
+    <h3 class="text-lg font-semibold mb-2">No Yearly Data Available</h3>
+    <p class="mb-4 text-gray-600 dark:text-gray-400">Add expenses to begin tracking yearly trends.</p>
+    <button class="text-blue-600 underline" (click)="loadAvailableYears()">Refresh</button>
+  </div>
+
+  <!-- Main Content Section when report data is present -->
+  <ng-container *ngIf="displayReportData && !isLoading && !errorMessage && !isLoadingYears">
+
+    <!-- Year Info Card -->
+    <div class="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-100 dark:border-gray-800 px-6 py-4 text-center">
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-white">{{ displayReportData.year?.label }}</h3>
+      <p class="text-gray-600 dark:text-gray-400">Fiscal period: {{ getYearRange() }}</p>
+      <div class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+        {{ displayReportData.year?.months?.length ?? 0 }} Months • {{ displayReportData.year?.quarters?.length ?? 0 }} Quarters
+      </div>
+    </div>
+
+    <!-- Filter Badge -->
+    <div *ngIf="selectedCategoryFilter" class="mb-4 flex items-center gap-2">
+      <span class="text-sm">Filtering by: <b class="text-blue-600">{{ selectedCategoryFilter }}</b></span>
+      <button class="ml-2 text-xs text-blue-600 underline" (click)="clearFilter()">Clear Filter</button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-bold text-green-600">💰</span>
+          <span class="font-medium text-gray-500 dark:text-gray-400">Total Income</span>
+        </div>
+        <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ formatAsINR(displayReportData.totalIncome ?? 0) }}</div>
+      </div>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-bold text-red-600">💸</span>
+          <span class="font-medium text-gray-500 dark:text-gray-400">{{ selectedCategoryFilter ? "Expense in Category" : "Total Expense" }}</span>
+        </div>
+        <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ formatAsINR(displayReportData.totalExpense ?? 0) }}</div>
+      </div>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-bold text-blue-600">🎯</span>
+          <span class="font-medium text-gray-500 dark:text-gray-400">Net Savings</span>
+        </div>
+        <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ formatAsINR(displayReportData.savings ?? 0) }}</div>
+      </div>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-bold text-purple-600">📈</span>
+          <span class="font-medium text-gray-500 dark:text-gray-400">Savings Rate</span>
+        </div>
+        <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ displayReportData.savingsRate ?? 0 }}%</div>
+      </div>
+    </div>
+
+    <!-- Charts Row: Pie, Monthly Trend -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Pie Chart -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Expense Categories</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Click a category to filter data</p>
+        <div echarts [options]="pieChartOptions" (chartClick)="onChartClick($event)" style="width:100%; height:400px;"></div>
+      </div>
+      <!-- Monthly Trend -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Monthly Spending Trend</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          {{ selectedCategoryFilter ? ('Monthly trend for ' + selectedCategoryFilter) : 'Complete monthly spending for the year' }}
+        </p>
+        <ng-container *ngIf="isMonthlyDataFilteredAndEmpty; else monthlyBarBlock">
+          <div class="flex flex-col items-center justify-center py-10">
+            <span class="mb-2 text-indigo-500 text-2xl">😕</span>
+            <span class="mb-2 text-gray-500">No data for {{ selectedCategoryFilter }}</span>
+            <button class="text-xs text-blue-700 underline" (click)="clearFilter()">Show All Categories</button>
+          </div>
+        </ng-container>
+        <ng-template #monthlyBarBlock>
+          <div echarts [options]="monthlyTrendOptions" style="width:100%; height:400px;"></div>
+        </ng-template>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <!-- Quarterly Bar Chart -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Quarterly Performance</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Q1 through Q4 spending comparison
+        </p>
+        <div echarts [options]="quarterlyBarOptions" style="width:100%; height:400px;"></div>
+      </div>
+      <!-- Year-over-Year Comparison -->
+      <div *ngIf="fullReportData?.hasPreviousYearData && fullReportData?.previousYear" class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Year-over-Year Comparison</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Compare with previous year performance (category-aware)
+        </p>
+        <div echarts [options]="comparisonChartOptions" style="width:100%; height:400px;"></div>
+      </div>
+    </div>
+
+    <!-- Category Breakdown Table -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Category Breakdown</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-900">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Percentage</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tr *ngFor="let cat of fullReportData?.category || []"
+                [class.bg-blue-50]="(cat.category || 'Uncategorized') === selectedCategoryFilter"
+                style="cursor:pointer;">
+              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                {{ cat.category || 'Uncategorized' }}
+              </td>
+              <td class="px-6 py-4 text-gray-900 dark:text-white">
+                {{ formatAsINR(cat.amount) }}
+              </td>
+              <td class="px-6 py-4 text-gray-500 dark:text-gray-300">
+                {{ getCategoryPercentage(cat.amount) }}%
+              </td>
+              <td class="px-6 py-4">
+                <button
+                  (click)="toggleCategoryFilter(cat.category || 'Uncategorized')"
+                  class="px-3 py-1 rounded text-xs font-semibold transition-colors"
+                  [ngClass]="{
+                    'bg-blue-100 text-blue-800': (cat.category || 'Uncategorized') === selectedCategoryFilter,
+                    'bg-gray-100 text-gray-800': (cat.category || 'Uncategorized') !== selectedCategoryFilter
+                  }"
+                >
+                  {{ (cat.category || 'Uncategorized') === selectedCategoryFilter ? 'Clear' : 'Filter' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Annual Summary Stats Block -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col">
+        <h4 class="text-lg font-semibold mb-2">📊 Annual Summary</h4>
+        <span>Days Tracked: <b>{{ displayReportData.daily?.length ?? 0 }}</b></span>
+        <span>Categories: <b>{{ displayReportData.category?.length ?? 0 }}</b></span>
+        <span>Avg Monthly Spend: <b>{{ formatAsINR((displayReportData.totalExpense ?? 0) / 12) }}</b></span>
+        <span>Avg Daily Spend: <b>{{ formatAsINR((displayReportData.totalExpense ?? 0) / (displayReportData.daily?.length || 1)) }}</b></span>
+      </div>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col" *ngIf="fullReportData?.hasPreviousYearData && fullReportData?.previousYear">
+        <h4 class="text-lg font-semibold mb-2">📅 Previous Year</h4>
+        <span>Expense: <b>{{ formatAsINR(fullReportData?.previousYear?.totalExpense ?? 0) }}</b></span>
+        <span>Savings: <b>{{ formatAsINR(fullReportData?.previousYear?.savings ?? 0) }}</b></span>
+        <span>Year-over-Year Change:
+          <b
+            [class.text-green-600]="displayReportData.totalExpense < (fullReportData?.previousYear?.totalExpense ?? 0)"
+            [class.text-red-600]="displayReportData.totalExpense > (fullReportData?.previousYear?.totalExpense ?? 0)">
+            {{ displayReportData.totalExpense > (fullReportData?.previousYear?.totalExpense ?? 0) ? '+' : '' }}
+            {{
+              (
+                (displayReportData.totalExpense - (fullReportData?.previousYear?.totalExpense ?? 0))
+                / ((fullReportData?.previousYear?.totalExpense || 1)) * 100
+              ).toFixed(1)
+            }}%
+          </b>
+        </span>
+      </div>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col" *ngIf="!displayReportData.hasPreviousYearData">
+        <h4 class="text-lg font-semibold mb-2">🎯 Getting Started</h4>
+        <span>Tracking Status: <b>First Year</b></span>
+        <span>Baseline Established: <b>✅ Complete</b></span>
+        <span>Next Year: <b>Year-over-year comparisons will be available</b></span>
+      </div>
+    </div>
+
+  </ng-container>
+</div>

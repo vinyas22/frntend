@@ -1,0 +1,32 @@
+<div class="p-4">
+  <h2 class="text-2xl font-semibold flex items-center mb-4">
+    <ng-icon name="HeroDocumentText" class="w-6 h-6 mr-2 text-blue-600" /> Bills
+  </h2>
+  <div *ngIf="loading" class="text-gray-600">Loading...</div>
+  <div *ngIf="!loading && bills.length === 0" class="text-gray-400">No bills found.</div>
+  <table *ngIf="!loading && bills.length" class="min-w-full divide-y divide-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow">
+    <thead>
+      <tr>
+        <th class="px-4 py-2 text-left">Title</th>
+        <th class="px-4 py-2 text-left">Month</th>
+        <th class="px-4 py-2 text-left">Balance</th>
+        <th class="px-4 py-2 text-left">Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let bill of bills" class="hover:bg-gray-100 dark:hover:bg-gray-700">
+        <td class="px-4 py-2 text-blue-600 underline flex items-center">
+          <a
+            [routerLink]="['/dashboard/bills', bill.id, 'entries']"
+            class="flex items-center w-full hover:text-blue-800 dark:hover:text-blue-300 focus:outline-none"
+          >
+            <ng-icon name="HeroChartPie" class="w-5 h-5 mr-1 text-blue-400" />{{bill.title}}
+          </a>
+        </td>
+        <td class="px-4 py-2">{{bill.bill_month}}</td>
+        <td class="px-4 py-2">₹{{bill.total_balance | number:'1.2-2'}}</td>
+        <td class="px-4 py-2">{{bill.created_at | date:'shortDate'}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

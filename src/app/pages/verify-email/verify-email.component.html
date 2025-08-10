@@ -1,0 +1,17 @@
+<div class="container">
+  <div class="top"></div>
+  <div class="bottom"></div>
+  <div class="center">
+    <ng-container *ngIf="verifying">
+      <div>Verifying your email...</div>
+    </ng-container>
+    <ng-container *ngIf="success">
+      <div class="text-green-700 font-bold mb-4">Email verified successfully!</div>
+      <a routerLink="/login" class="text-blue-600 underline">Go to Login</a>
+    </ng-container>
+    <ng-container *ngIf="error">
+      <div class="text-red-700 font-bold mb-4">{{ error }}</div>
+      <a routerLink="/login" class="text-blue-600 underline">Back to Login</a>
+    </ng-container>
+  </div>
+</div>

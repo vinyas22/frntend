@@ -1,0 +1,105 @@
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+body {
+  min-height: 100vh;
+  font-family: "Jost", sans-serif;
+  background: transparent !important;
+}
+:host {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 99;
+  background: transparent;
+  display: block;
+}
+.container {
+  position: flex;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: transparent;
+
+  .top, .bottom {
+    position: absolute;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    &:before, &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      width: 200vmax; height: 200vmax;
+      top: 50%; left: 50%;
+      margin-top: -100vmax;
+      transform-origin: 0 50%;
+      transition: all 0.5s cubic-bezier(0.445, 0.05, 0, 1);
+      z-index: 10; opacity: 0.65;
+      transition-delay: 0.2s;
+      background-repeat: no-repeat;
+    }
+  }
+  .top {
+    &:before  { transform: rotate(45deg);   background: #e46569; }
+    &:after   { transform: rotate(135deg);  background: #ecaf81; }
+  }
+  .bottom {
+    &:before  { transform: rotate(-45deg);  background: #60b8d4; }
+    &:after   { transform: rotate(-135deg); background: #3745b5; }
+  }
+  &:hover, &:active, &:focus-within {
+    .top, .bottom {
+      &:before, &:after {
+        margin-left: 350px;
+        transform-origin: -350px 50%;
+        transition-delay: 0s;
+      }
+    }
+    .center {
+      opacity: 1;
+      pointer-events: auto;
+      transition-delay: 0.2s;
+    }
+  }
+}
+.center {
+  position: relative;
+  width: 400px;
+  max-width: 95vw;
+  min-width: 260px;
+  background: #fff;
+//   border-radius: 18px;
+//   box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+//   padding: 40px 32px 32px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  font-family: "Jost", sans-serif;
+  opacity: 0; /* Hidden at load */
+  pointer-events: none;
+  transition: opacity 0.5s cubic-bezier(0.445, 0.05, 0, 1);
+
+  /* Show on interaction */
+  &:hover, &:active, &:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+    transition-delay: 0.2s;
+  }
+
+  .font-bold { font-weight: 600; }
+  .text-green-700 { color: #0ea462; }
+  .text-red-700 { color: #e46569; }
+  .text-blue-600 { color: #3745b5; }
+  a { text-decoration: underline; font-weight: 500; }
+}
+@media (max-width: 540px) {
+  .center {
+    width: 98vw;
+    min-width: 200px;
+    margin: 0;
+    padding: 18px 4vw 22px 4vw;
+  }
+}

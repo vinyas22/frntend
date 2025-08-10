@@ -1,0 +1,190 @@
+<div class="mx-auto max-w-5xl px-4 py-8 transition-all duration-300">
+
+  <!-- Header -->
+  <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Quarterly Report</h1>
+      <p class="text-gray-600 dark:text-gray-400">Track your quarterly income, expenses, and savings</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <label for="quarter-select" class="font-medium text-gray-600 dark:text-gray-400 mr-2">Quarter:</label>
+      <select
+        id="quarter-select"
+        [(ngModel)]="selectedQuarter"
+        (change)="onQuarterChange()"
+        [disabled]="isLoadingQuarters"
+        class="rounded-md border border-gray-300 dark:border-gray-700 px-3 py-2 bg-white dark:bg-gray-800 text-base text-gray-900 dark:text-white transition"
+      >
+        <option value="">Select a quarter...</option>
+        <option *ngFor="let q of quarterOptions" [value]="q.value">{{ q.label }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Filter Loading State -->
+  <div *ngIf="isFilterLoading && !isLoading" class="flex items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-20 w-20 border-b-2 border-indigo-600 mr-4"></div>
+    <p class="text-lg text-indigo-600 font-medium">Applying filter...</p>
+  </div>
+
+  <!-- Error State Boxed -->
+  <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+    <div class="flex items-start">
+      <div class="flex-shrink-0">
+        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+        </svg>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-red-800">Error Loading Report</h3>
+        <p class="mt-1 text-sm text-red-700">{{errorMessage}}</p>
+        <button (click)="loadReport()" class="mt-2 text-sm font-medium text-red-800 hover:text-red-600">
+          Try again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Badge -->
+  <div *ngIf="selectedCategoryFilter" class="mb-4 flex items-center gap-2">
+    <span class="text-sm">Filtering by: <b class="text-blue-600">{{ selectedCategoryFilter }}</b></span>
+    <button class="ml-2 text-xs text-blue-600 underline" (click)="clearFilter()">Clear Filter</button>
+  </div>
+
+  <!-- Empty State If No Data -->
+  <div *ngIf="!displayReportData && !isLoading && !errorMessage" class="bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-100 dark:border-gray-800 text-center py-20">
+    <span class="block text-5xl mb-3">📊</span>
+    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">No Quarterly Data</h3>
+    <p class="mb-2 text-gray-600 dark:text-gray-400">Change quarter or add data to start analyzing your finances.</p>
+  </div>
+
+  <!-- Main Content Section: Data -->
+  <ng-container *ngIf="!isLoading && !errorMessage && displayReportData">
+
+    <!-- Quarter Info Card -->
+    <div class="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow border border-gray-100 dark:border-gray-800 px-6 py-4 text-center">
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-white">{{ displayReportData.quarter?.label }}</h3>
+      <p class="text-gray-600 dark:text-gray-400">Quarterly financial overview: {{ getQuarterRange() }}</p>
+    </div>
+
+    <!-- Summary Cards, boxed in a Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-bold text-green-600">💰</span>
+          <span class="font-medium text-gray-500 dark:text-gray-400">Total Income</span>
+        </div>
+        <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ formatAsINR(displayReportData.totalIncome) }}</div>
+      </div>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-bold text-red-600">💸</span>
+          <span class="font-medium text-gray-500 dark:text-gray-400">
+            {{ selectedCategoryFilter ? "Expense in Category" : "Total Expense" }}
+          </span>
+        </div>
+        <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ formatAsINR(displayReportData.totalExpense) }}</div>
+      </div>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-bold text-blue-600">🎯</span>
+          <span class="font-medium text-gray-500 dark:text-gray-400">Net Savings</span>
+        </div>
+        <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ formatAsINR(displayReportData.savings) }}</div>
+      </div>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 flex flex-col">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-bold text-purple-600">📈</span>
+          <span class="font-medium text-gray-500 dark:text-gray-400">Savings Rate</span>
+        </div>
+        <div class="text-2xl font-semibold text-gray-900 dark:text-white">{{ displayReportData.savingsRate }}%</div>
+      </div>
+    </div>
+
+    <!-- Charts: Expense Category Pie + Timeline Bar Chart -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Expense Categories</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Click a category to filter data</p>
+        <div echarts [options]="pieChartOptions" (chartClick)="onChartClick($event)" style="width:100%; height:400px;"></div>
+      </div>
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6">
+        <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Daily Spending Timeline</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          {{ selectedCategoryFilter ? ('Showing: ' + selectedCategoryFilter) : 'Complete daily spending for the quarter'}}
+        </p>
+        <ng-container *ngIf="isDailySpendFilteredAndEmpty; else barChartBlock">
+          <div class="flex flex-col items-center justify-center py-10">
+            <span class="mb-2 text-indigo-500 text-2xl">😕</span>
+            <span class="mb-2 text-gray-500">No data for {{ selectedCategoryFilter }}</span>
+            <button class="text-xs text-blue-700 underline" (click)="clearFilter()">Show All Categories</button>
+          </div>
+        </ng-container>
+        <ng-template #barChartBlock>
+          <div echarts [options]="barChartOptions" style="width:100%; height:400px;"></div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Quarter Comparison Chart (Current vs Previous) -->
+    <div *ngIf="fullReportData?.previousQuarter" class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8">
+      <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Quarter Comparison</h3>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        {{ selectedCategoryFilter ? selectedCategoryFilter + ' - ' : ''}}Current vs Previous Quarter
+      </p>
+      <div echarts [options]="comparisonChartOptions" style="width:100%; height:400px;"></div>
+    </div>
+
+    <!-- Category Breakdown Table (boxed) -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Category Breakdown</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-900">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Amount</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Percentage</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tr
+              *ngFor="let cat of fullReportData?.category"
+              [class.bg-blue-50]="(cat.category || 'Uncategorized') === selectedCategoryFilter"
+              style="cursor:pointer;">
+              <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                {{ cat.category || 'Uncategorized' }}
+              </td>
+              <td class="px-6 py-4 text-gray-900 dark:text-white">
+                {{ formatAsINR(cat.amount) }}
+              </td>
+              <td class="px-6 py-4 text-gray-500 dark:text-gray-300">
+                {{ getCategoryPercentage(cat.amount) }}%
+              </td>
+              <td class="px-6 py-4">
+                <button
+                  (click)="toggleCategoryFilter(cat.category || 'Uncategorized')"
+                  class="px-3 py-1 rounded text-xs font-semibold transition-colors"
+                  [ngClass]="{
+                    'bg-blue-100 text-blue-800': (cat.category || 'Uncategorized') === selectedCategoryFilter,
+                    'bg-gray-100 text-gray-800': (cat.category || 'Uncategorized') !== selectedCategoryFilter
+                  }"
+                >
+                  {{ (cat.category || 'Uncategorized') === selectedCategoryFilter ? 'Clear' : 'Filter' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+</div>

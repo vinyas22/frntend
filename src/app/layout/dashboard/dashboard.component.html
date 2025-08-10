@@ -1,0 +1,10 @@
+<!-- Dashboard layout: sidebar + header + main content area -->
+<div class="dashboard-layout">
+  <app-sidebar></app-sidebar>
+  <div class="main-panel" [class.ml-64]="!isCollapsed" [class.ml-16]="isCollapsed">
+    <app-header></app-header>
+    <main class="dashboard-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

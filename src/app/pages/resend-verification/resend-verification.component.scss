@@ -1,0 +1,25 @@
+/* Existing content from resend-verification.component.scss */
+
+@media (max-width: 768px) {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  img, table {
+    max-width: 100%;
+    height: auto;
+  }
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  .container, .content, .wrapper {
+    padding: 8px !important;
+  }
+  body, button, input, select, textarea {
+    font-size: clamp(14px, 2.5vw, 16px);
+  }
+  button, a {
+    min-height: 44px;
+  }
+}

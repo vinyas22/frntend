@@ -1,0 +1,124 @@
+<div class="report-root">
+  <!-- Header -->
+  <div class="report-header">
+    <h1 class="report-title">Weekly Report</h1>
+    <p class="report-desc">
+      Track your weekly expenses, savings vs last week, and week-over-week improvement
+    </p>
+  </div>
+
+  <!-- Period Selector -->
+  <div class="report-card report-period-selector">
+    <app-period-selector
+      [periods]="availableWeeks"
+      [selectedPeriod]="selectedWeek"
+      [loading]="loading"
+      periodType="week"
+      (periodSelected)="onWeekSelected($event)"
+      (refresh)="onRefresh()"></app-period-selector>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="report-loading">
+    <div class="report-spinner"></div>
+  </div>
+
+  <!-- Error Card -->
+  <div *ngIf="error && !loading" class="report-card report-error">
+    <div class="report-error-content">
+      <span class="report-error-icon">&#9888;</span>
+      <div>
+        <h3>Error Loading Report</h3>
+        <p>{{ error }}</p>
+        <button (click)="onRefresh()">Try again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div *ngIf="isFiltered()" class="report-filter-bar">
+    <span>Filtering by: <b class="filter-value">{{ selectedCategory }}</b></span>
+    <button (click)="clearCategoryFilter()">Clear Filter</button>
+  </div>
+
+  <!-- Main Data -->
+  <div *ngIf="reportData && !loading">
+    <!-- Summary Cards -->
+    <div class="report-cards-row">
+      <div class="report-card">
+        <app-summary-card
+          title="Weekly Expenses"
+          [value]="!selectedCategory ? reportData.totalExpense : findCategoryAmount(filteredCategories, selectedCategory)"
+          [comparison]="expenseComparison"
+          type="expense"></app-summary-card>
+      </div>
+    </div>
+
+    <!-- Charts Row: Pie & Bar side by side -->
+    <div class="report-charts-row">
+      <div class="report-card chart-card half-chart">
+        <div class="chart-title">Category Breakdown</div>
+        <div #pieChart id="pieChart" class="chart-container"></div>
+      </div>
+      <div class="report-card chart-card half-chart">
+        <div class="chart-title">Daily Expenses Bar Chart</div>
+        <div #barChart id="barChart" class="chart-container"></div>
+      </div>
+    </div>
+
+    <!-- Comparison Chart -->
+    <div class="report-card chart-card">
+      <div class="chart-title">Comparison Chart</div>
+      <div #comparisonChart id="comparisonChart" class="chart-container"></div>
+    </div>
+
+    <!-- Breakdown Table -->
+    <div class="report-card report-table-card">
+      <div class="report-table-title">Category Breakdown</div>
+      <div class="report-table-wrapper">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>Previous Week</th>
+              <th>Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let category of filteredCategories"
+                (click)="onCategoryClick(category.category)"
+                [class.row-selected]="selectedCategory === category.category">
+              <td>{{ category.category }}</td>
+              <td class="amount">{{ category.amount | currency:'INR':'symbol':'1.0-0' }}</td>
+              <td>
+                <ng-container *ngIf="reportData?.previousWeek?.category as prevCategories">
+                  {{ findCategoryAmount(getFilteredPrevCategories(prevCategories), category.category) | currency:'INR':'symbol':'1.0-0' }}
+                </ng-container>
+              </td>
+              <td>
+                <ng-container *ngIf="reportData?.previousWeek?.category as prevCategories">
+                  <span
+                    class="change-badge"
+                    [class.badge-pos]="getCategoryChange(category, getFilteredPrevCategories(prevCategories)) < 0"
+                    [class.badge-neg]="getCategoryChange(category, getFilteredPrevCategories(prevCategories)) > 0"
+                    [class.badge-neutral]="getCategoryChange(category, getFilteredPrevCategories(prevCategories)) === 0"
+                  >
+                    {{ getCategoryChange(category, getFilteredPrevCategories(prevCategories)) | percentage }}
+                  </span>
+                </ng-container>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!reportData && !loading && !error" class="report-card report-empty">
+    <div class="empty-icon">&#128202;</div>
+    <h3>No data available</h3>
+    <p>Select a week to view your report data.</p>
+  </div>
+</div>

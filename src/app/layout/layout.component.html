@@ -1,0 +1,40 @@
+<!-- Layout -->
+<div class="layout-container" [class.sidebar-collapsed]="isSidebarCollapsed">
+  <!-- Header: fixed + full width -->
+  <header class="header-bar">
+    <button class="sidebar-toggle" (click)="toggleSidebar()" aria-label="Open Sidebar">
+      <!-- Hamburger Icon -->
+      <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <h1 class="app-title">MyApp</h1>
+    <div class="header-actions">
+      <button class="theme-toggle" (click)="toggleDarkMode()"><!-- moon/sun icon --></button>
+      <app-notification-bell></app-notification-bell>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- SideBar: hidden/off-canvas on mobile, always present on desktop -->
+  <aside
+    [class.show]="!isMobile || showMobileSidebar"
+    [class.hide]="isMobile && !showMobileSidebar"
+    [class.collapsed]="isSidebarCollapsed && !isMobile"
+    class="app-sidebar"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Sidebar content goes here (navigation, dropdowns, etc) -->
+    <!-- ...as per your previous HTML... -->
+  </aside>
+
+  <!-- Mobile overlay: covers main when sidebar is open -->
+  <div
+    class="mobile-overlay"
+    *ngIf="isMobile && showMobileSidebar"
+    (click)="closeMobileSidebar()"
+  ></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

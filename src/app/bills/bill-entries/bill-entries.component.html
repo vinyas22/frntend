@@ -1,0 +1,50 @@
+<div class="max-w-3xl mx-auto p-4 px-3 sm:px-4">
+  <h2 class="text-xl font-semibold flex items-center mb-4">
+    <ng-icon name="HeroDocumentText" class="w-6 h-6 mr-2 text-green-600" />
+    Entries for Bill #{{billId}}
+  </h2>
+
+  <div *ngIf="loading" class="text-gray-500 dark:text-gray-400">Loading...</div>
+  <div *ngIf="errorMsg" class="text-red-500 dark:text-red-400 py-2">{{ errorMsg }}</div>
+  <div *ngIf="!loading && !errorMsg && entries.length === 0" class="text-gray-400 dark:text-gray-500">No entries found.</div>
+
+  <div *ngFor="let entry of entries" class="mb-8">
+    <!-- Entry "header" -->
+    <div class="flex justify-between items-end mb-2">
+      <div>
+        <span class="font-bold text-gray-800 dark:text-gray-100">Date:</span>
+        <span class="text-gray-700 dark:text-gray-200">{{entry.entry_date | date:'shortDate'}}</span>
+      </div>
+      <div>
+        <span class="font-bold text-gray-800 dark:text-gray-100">Debit:</span>
+        <span class="text-slate-700 dark:text-slate-100">₹{{entry.total_debit | number:'1.2-2'}}</span>
+      </div>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-100 dark:border-gray-700">
+        <thead>
+          <tr>
+            <th class="p-3 text-left font-semibold text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">Category</th>
+            <th class="p-3 text-left font-semibold text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">Description</th>
+            <th class="p-3 text-left font-semibold text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">Amount</th>
+            <th class="p-3 text-left font-semibold text-gray-800 dark:text-gray-100 bg-gray-50 dark:bg-gray-900">Proof</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of entry.items" class="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900">
+            <td class="p-2">{{item.category}}</td>
+            <td class="p-2">{{item.description}}</td>
+            <td class="p-2">₹{{item.amount | number:'1.2-2'}}</td>
+            <td class="p-2">
+              <a *ngIf="item.proof_url"
+                 [href]="item.proof_url" target="_blank"
+                 class="text-blue-600 dark:text-blue-400 underline"
+              >Proof</a>
+              <span *ngIf="!item.proof_url" class="text-gray-400 dark:text-gray-500">—</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

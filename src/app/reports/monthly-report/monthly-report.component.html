@@ -1,0 +1,153 @@
+<div class="report-main-wrapper">
+  <!-- Header Row -->
+  <div class="header-row">
+    <div>
+      <h1>Monthly Report</h1>
+      <p class="subtitle">Track your monthly income, expenses, and savings</p>
+    </div>
+    <div class="month-picker">
+      <label for="month-select">Month:</label>
+      <input
+        type="month"
+        id="month-select"
+        [(ngModel)]="selectedMonth"
+        (change)="onMonthChange()"
+        [disabled]="isLoading"
+      />
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="spinner-row">
+    <div class="big-spinner"></div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage && !isLoading" class="error-card">
+    <div>
+      <span class="icon">⚠️</span>
+      <div>
+        <strong>Error Generating Report</strong>
+        <div>{{errorMessage}}</div>
+        <button (click)="loadReport()">Try again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Badge -->
+  <div *ngIf="selectedCategoryFilter" class="filter-row">
+    <span>Filtering by: <b>{{ selectedCategoryFilter }}</b></span>
+    <button class="clear-btn" (click)="clearFilter()">Clear Filter</button>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!displayReportData && !isLoading && !errorMessage" class="bg-card empty-state">
+    <span class="emoji">📅</span>
+    <h3>No Report Data</h3>
+    <p>Change period or add data to start tracking your finances for this month.</p>
+  </div>
+
+  <!-- Main Content Section: Data -->
+  <ng-container *ngIf="!isLoading && !errorMessage && displayReportData">
+    <!-- Month info card -->
+    <div class="bg-card info-card">
+      <h3>{{ getMonthName() }}</h3>
+      <p>Monthly financial overview</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="stats-grid">
+      <div class="stat-card income">
+        <span class="icon">💰</span>
+        <div class="stat-amt">{{ formatAsINR(displayReportData.totalIncome) }}</div>
+        <small>Total Income</small>
+      </div>
+      <div class="stat-card expense">
+        <span class="icon">💸</span>
+        <div class="stat-amt">{{ formatAsINR(displayReportData.totalExpense) }}</div>
+        <small>{{ selectedCategoryFilter ? "Expense in Category" : "Total Expense" }}</small>
+      </div>
+      <div class="stat-card savings">
+        <span class="icon">🎯</span>
+        <div class="stat-amt">{{ formatAsINR(displayReportData.totalIncome - displayReportData.totalExpense) }}</div>
+        <small>Net Savings</small>
+      </div>
+      <div class="stat-card rate">
+        <span class="icon">📈</span>
+        <div class="stat-amt">{{ displayReportData.savingsRate }}%</div>
+        <small>Savings Rate</small>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="bg-card chart-box">
+        <h3>Expense Categories</h3>
+        <p>Click a category to filter data</p>
+        <div echarts [options]="pieChartOptions" (chartClick)="onChartClick($event)" class="echart-visual"></div>
+      </div>
+      <div class="bg-card chart-box">
+        <h3>Daily Spending Timeline</h3>
+        <p>
+          {{ selectedCategoryFilter ? ('Showing: ' + selectedCategoryFilter) : 'Complete daily spending for the month'}}
+        </p>
+        <ng-container *ngIf="isDailySpendFilteredAndEmpty; else barChartBlock">
+          <div class="no-bar-data">
+            <span>😕</span>
+            <span>No data for {{ selectedCategoryFilter }}</span>
+            <button (click)="clearFilter()">Show All Categories</button>
+          </div>
+        </ng-container>
+        <ng-template #barChartBlock>
+          <div echarts [options]="barChartOptions" class="echart-visual"></div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Comparison Chart -->
+    <div *ngIf="fullReportData?.previousMonth" class="bg-card chart-box">
+      <h3>Month Comparison</h3>
+      <p>
+        {{ selectedCategoryFilter ? selectedCategoryFilter + ' - ' : ''}}Current vs Previous Month
+      </p>
+      <div echarts [options]="comparisonChartOptions" class="echart-visual"></div>
+    </div>
+
+    <!-- Category Table -->
+    <div class="bg-card table-card">
+      <div class="table-head">
+        <h3>Category Breakdown</h3>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>Percentage</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let cat of fullReportData?.category"
+              [class.active-row]="(cat.category || 'Uncategorized') === selectedCategoryFilter"
+            >
+              <td>{{ cat.category || 'Uncategorized' }}</td>
+              <td>{{ formatAsINR(cat.amount) }}</td>
+              <td>{{ getCategoryPercentage(cat.amount) }}%</td>
+              <td>
+                <button
+                  (click)="toggleCategoryFilter(cat.category || 'Uncategorized')"
+                  [class.active-row]="(cat.category || 'Uncategorized') === selectedCategoryFilter"
+                >
+                  {{ (cat.category || 'Uncategorized') === selectedCategoryFilter ? 'Clear' : 'Filter' }}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+</div>

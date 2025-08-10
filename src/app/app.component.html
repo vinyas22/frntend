@@ -1,0 +1,25 @@
+<ng-container *ngIf="!isLoginLayout; else authLayout">
+  <div class="dashboard-layout">
+    <app-sidebar></app-sidebar>
+    <div class="main-panel" >
+      <app-header></app-header>
+      <app-notification-toast
+        *ngIf="latestToast"
+        [notification]="latestToast"
+        (closed)="latestToast = null"
+        (clicked)="latestToast = null"></app-notification-toast>
+      <main class="dashboard-content">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #authLayout>
+  <app-notification-toast
+    *ngIf="latestToast"
+    [notification]="latestToast"
+    (closed)="latestToast = null"
+    (clicked)="latestToast = null"></app-notification-toast>
+  <router-outlet></router-outlet>
+</ng-template>

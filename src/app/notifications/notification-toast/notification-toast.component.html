@@ -1,0 +1,55 @@
+<div
+  class="fixed top-6 right-6 z-50 w-full max-w-xs md:max-w-sm transition-all duration-300 transform"
+  [class.opacity-0]="!isVisible"
+  [class.opacity-100]="isVisible"
+  [class.translate-y-0]="isVisible"
+  [class.translate-y-5]="!isVisible"
+  role="alert"
+  aria-live="polite"
+  aria-atomic="true"
+>
+  <div
+    [ngClass]="{
+      'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700': true,
+      'shadow-lg rounded-xl p-4 flex items-start gap-3': true,
+      'border-green-400 bg-green-50': notification.type === 'success',
+      'border-red-400 bg-red-50': notification.type === 'error',
+      'border-yellow-400 bg-yellow-50': notification.type === 'warning',
+      'border-blue-400 bg-blue-50': notification.type === 'info'
+    }"
+  >
+    <span class="mt-1 text-2xl"
+      [ngClass]="{
+        'text-green-500': notification.type === 'success',
+        'text-red-500': notification.type === 'error',
+        'text-yellow-400': notification.type === 'warning',
+        'text-blue-500': notification.type === 'info'
+      }"
+    >
+      {{ getNotificationIcon() }}
+    </span>
+    <div class="flex-1 min-w-0">
+      <h4 class="font-semibold mb-1 text-base truncate">
+        {{ notification.title }}
+      </h4>
+      <div class="text-sm mb-2 text-gray-600 dark:text-gray-400 break-words">
+        {{ notification.message }}
+      </div>
+      <button
+        (click)="handleClick()"
+        class="inline-block text-indigo-700 font-medium hover:underline transition text-xs mt-1"
+        *ngIf="notification.data && (notification.data.reportType || notification.data.url)"
+      >View Report →</button>
+    </div>
+    <button
+      (click)="close()"
+      class="ml-2 text-gray-400 hover:text-gray-700 transition"
+      aria-label="Close notification"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 20 20">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+      </svg>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,157 @@
+<div class="dashboard-home">
+  <!-- Stats Grid -->
+  <section class="stats-grid">
+    <div class="stat-card weekly">
+      <div class="icon-pill">
+        <!-- Weekly SVG -->
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9" stroke-width="2"/>
+          <path d="M12 8v4l3 3" />
+        </svg>
+      </div>
+      <div class="stat-meta">
+        <h3>Weekly Spending</h3>
+        <div class="value">
+          ₹{{ stats.weekly?.amount | number:'0.0-0' }}
+        </div>
+        <div [class.pos]="stats.weekly?.change >= 0" [class.neg]="stats.weekly?.change < 0" class="change">
+          {{ stats.weekly?.change || 0 }}%
+        </div>
+      </div>
+    </div>
+    <div class="stat-card monthly">
+      <div class="icon-pill">
+        <!-- Monthly SVG -->
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+        </svg>
+      </div>
+      <div class="stat-meta">
+        <h3>Monthly Spending</h3>
+        <div class="value">
+          ₹{{ stats.monthly?.amount | number:'0.0-0' }}
+        </div>
+        <div [class.pos]="stats.monthly?.change >= 0" [class.neg]="stats.monthly?.change < 0" class="change">
+          {{ stats.monthly?.change || 0 }}%
+        </div>
+      </div>
+    </div>
+    <div class="stat-card quarterly">
+      <div class="icon-pill">
+        <!-- Quarterly SVG -->
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+      </div>
+      <div class="stat-meta">
+        <h3>Quarterly Spending</h3>
+        <div class="value">
+          ₹{{ stats.quarterly?.amount | number:'0.0-0' }}
+        </div>
+        <div [class.pos]="stats.quarterly?.change >= 0" [class.neg]="stats.quarterly?.change < 0" class="change">
+          {{ stats.quarterly?.change || 0 }}%
+        </div>
+      </div>
+    </div>
+    <div class="stat-card yearly">
+      <div class="icon-pill">
+        <!-- Yearly SVG -->
+        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2"/>
+        </svg>
+      </div>
+      <div class="stat-meta">
+        <h3>Yearly Spending</h3>
+        <div class="value">
+          ₹{{ stats.yearly?.amount | number:'0.0-0' }}
+        </div>
+        <div [class.pos]="stats.yearly?.change >= 0" [class.neg]="stats.yearly?.change < 0" class="change">
+          {{ stats.yearly?.change || 0 }}%
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category breakdown with tabs -->
+ <section class="category-section">
+  <div class="section-head">
+    <h2>Category Breakdown</h2>
+    <div class="tabs">
+      <button 
+        *ngFor="let period of ['week', 'month', 'quarter', 'year']"
+        [class.active]="selectedPeriod === period"
+        (click)="changePeriod(period)">
+        {{ period | titlecase }}
+      </button>
+    </div>
+  </div>
+  
+  <div class="table-scroll">
+    <table class="category-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th class="right">Amount</th>
+          <th class="right">%</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of categories">
+          <td class="cat-label">{{ category.category }}</td>
+          <td class="amt right">₹{{ category.amount | number:'0.0-0' }}</td>
+          <td class="pct right">{{ category.percentage | number:'0.0-0' }}%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+  <!-- Quarterly Report -->
+  <!-- <section class="quarter-section">
+    <div class="section-head">
+      <h2>Quarterly Report</h2>
+      <select [(ngModel)]="selectedQuarter" (change)="loadQuarterlyReport()">
+        <option *ngFor="let q of availableQuarters" [value]="q.value">{{ q.label }}</option>
+      </select>
+    </div>
+    <div *ngIf="quarterlyReport?.categories?.length > 0; else noQuarterData" class="category-list">
+      <div *ngFor="let q of quarterlyReport.categories" class="category-row">
+        <span class="cat-label">{{ q.category }}</span>
+        <div class="cat-amounts">
+          <span class="amt">₹{{ q.amount | number:'0.0-0' }}</span>
+          <span class="pct">({{ q.percentage | number: '0.0-0' }}%)</span>
+        </div>
+      </div>
+    </div>
+    <ng-template #noQuarterData>
+      <div class="no-data">No quarterly report data available</div>
+    </ng-template>
+  </section> -->
+
+  <!-- Recent Transactions Table -->
+  <section class="transactions-section">
+    <div class="section-head"><h2>Recent Transactions</h2></div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th class="right">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let transaction of transactions">
+            <td>{{ transaction.date | date:'shortDate' }}</td>
+            <td>{{ transaction.category }}</td>
+            <td>{{ transaction.description }}</td>
+            <td class="right amt">₹{{ transaction.amount | number:'0.0-0' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

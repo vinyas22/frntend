@@ -1,0 +1,42 @@
+<div class="max-w-lg mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-100 dark:border-gray-700 mt-6">
+  <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Update Bill Balance</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+
+    <!-- Bill Select -->
+    <div class="mb-4">
+      <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">Bill</label>
+      <select
+        formControlName="billId"
+        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:outline-none"
+        required
+      >
+        <option value="">Select bill...</option>
+        <option *ngFor="let bill of bills" [value]="bill.id">{{ bill.title }} ({{ bill.bill_month }})</option>
+      </select>
+    </div>
+
+    <!-- Total Balance Input -->
+    <div class="mb-4">
+      <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">New Total Balance</label>
+      <input
+        type="number"
+        formControlName="total_balance"
+        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:outline-none"
+      />
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="text-red-600 dark:text-red-400 mb-2 text-sm">
+      {{ error }}
+    </div>
+
+    <!-- Submit -->
+    <button
+      type="submit"
+      class="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white px-4 py-2 rounded shadow font-semibold transition"
+      [disabled]="submitting"
+    >
+      {{ submitting ? "Updating..." : "Update Balance" }}
+    </button>
+  </form>
+</div>

@@ -1,0 +1,109 @@
+<!-- Mobile Hamburger (OUTSIDE sidebar, only if hidden + mobile) -->
+<button
+  class="mobile-hamburger"
+  aria-label="Open sidebar"
+  *ngIf="isMobile && !showMobileSidebar"
+  (click)="openMobileSidebar()"
+>
+  <svg width="28" height="28" stroke="currentColor" stroke-width="2">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h20M4 14h20M4 21h20"/>
+  </svg>
+</button>
+
+<!-- Mobile Overlay (closes menu) -->
+<div
+  *ngIf="isMobile && showMobileSidebar"
+  class="sidebar-overlay"
+  (click)="closeMobileSidebar()"
+></div>
+
+<!-- Sidebar -->
+<aside
+  [class.sidebar-mobile]="isMobile"
+  [class.sidebar-open]="isMobile && showMobileSidebar"
+  [class.sidebar-closed]="isMobile && !showMobileSidebar"
+  [class.sidebar-collapsed]="!isMobile && isCollapsed"
+  tabindex="-1"
+  (click)="$event.stopPropagation()"
+>
+  <!-- Sidebar Header -->
+  <div class="sidebar-header">
+    <span class="brand" [class.collapsed]="isCollapsed && !isMobile">MyApp</span>
+    <!-- Collapse/expand button (desktop only) -->
+    <button
+      *ngIf="!isMobile"
+      type="button"
+      class="sidebar-toggle-btn"
+      aria-label="Toggle Sidebar"
+      (click)="layoutService.toggleSidebar(!isCollapsed)"
+    >
+      <svg width="24" height="24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16"/>
+      </svg>
+    </button>
+    <!-- Mobile close button (sidebar X) -->
+    <button
+      *ngIf="isMobile"
+      class="sidebar-close-btn"
+      (click)="closeMobileSidebar()"
+      aria-label="Close sidebar"
+    >
+      <svg width="26" height="26" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+    <a routerLink="/dashboard" routerLinkActive="active"
+       class="sidebar-link"
+       (click)="isMobile && closeMobileSidebar()">
+      <ng-icon name="HeroHome" class="sidebar-icon"></ng-icon>
+      <span class="sidebar-label" [class.hide]="isCollapsed && !isMobile">Dashboard</span>
+    </a>
+    <!-- Entries Dropdown -->
+    <button type="button" class="sidebar-link"
+      (click)="entriesDropdown = !entriesDropdown">
+      <ng-icon name="HeroDocumentText" class="sidebar-icon"></ng-icon>
+      <span class="sidebar-label" [class.hide]="isCollapsed && !isMobile">Entries</span>
+      <svg class="dropdown-arrow" [class.open]="entriesDropdown" width="19" height="19">
+        <path d="M6 8l4 4 4-4"/>
+      </svg>
+    </button>
+    <div class="sidebar-submenu"
+         [class.menu-open]="entriesDropdown && !isCollapsed && (!isMobile || showMobileSidebar)">
+      <a (click)="openAddEntry()" class="sidebar-sublink">Add Entry</a>
+    </div>
+    <!-- Bills Dropdown -->
+    <button type="button" class="sidebar-link"
+      (click)="billsDropdown = !billsDropdown">
+      <ng-icon name="HeroChartPie" class="sidebar-icon"></ng-icon>
+      <span class="sidebar-label" [class.hide]="isCollapsed && !isMobile">Bills</span>
+      <svg class="dropdown-arrow" [class.open]="billsDropdown" width="19" height="19">
+        <path d="M6 8l4 4 4-4"/>
+      </svg>
+    </button>
+    <div class="sidebar-submenu"
+         [class.menu-open]="billsDropdown && !isCollapsed && (!isMobile || showMobileSidebar)">
+      <a (click)="openCreateMonthlySalary()" class="sidebar-sublink">Monthly Salary</a>
+      <a (click)="openUpdateBalance()" class="sidebar-sublink">Update Balance</a>
+    </div>
+    <!-- Reports Dropdown -->
+    <button type="button" class="sidebar-link"
+      (click)="reportsDropdown = !reportsDropdown">
+      <ng-icon name="HeroBell" class="sidebar-icon"></ng-icon>
+      <span class="sidebar-label" [class.hide]="isCollapsed && !isMobile">Reports</span>
+      <svg class="dropdown-arrow" [class.open]="reportsDropdown" width="19" height="19">
+        <path d="M6 8l4 4 4-4"/>
+      </svg>
+    </button>
+    <div class="sidebar-submenu"
+         [class.menu-open]="reportsDropdown && !isCollapsed && (!isMobile || showMobileSidebar)">
+      <a (click)="openWeeklyReport()" class="sidebar-sublink">Weekly Report</a>
+      <a (click)="openMonthlyReport()" class="sidebar-sublink">Monthly Report</a>
+      <a (click)="openQuarterlyReport()" class="sidebar-sublink">Quarterly Report</a>
+      <a (click)="openYearlyReport()" class="sidebar-sublink">Yearly Report</a>
+    </div>
+  </nav>
+</aside>

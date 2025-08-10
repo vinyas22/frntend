@@ -1,0 +1,238 @@
+/* --- Google Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
+body { font-family: "Jost", sans-serif; }
+
+/* --- Tailwind CSS Core --- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Base Resets --- */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+*, *::before, *::after { box-sizing: inherit; }
+
+/* =============================================================
+   DARK MODE: Universal Palette (.dark on <html>)
+   ============================================================= */
+
+/* === Unified backgrounds and text === */
+.dark body,
+.dark .dashboard-layout,
+.dark .dashboard-home,
+.dark aside,
+.dark .header,
+.dark .category-section,
+.dark .quarter-section,
+.dark .transactions-section {
+  background: #232a37 !important;
+  color: #e9eaf0 !important;
+}
+
+/* === Sidebar === */
+.dark aside { background: #232a37 !important; border-color: #283043 !important; }
+.dark .sidebar-header { border-color: #283043 !important; }
+.dark .sidebar-link:hover,
+.dark .sidebar-link.active { background: #283043 !important; color: #61aae7 !important; }
+.dark .sidebar-sublink { color: #d8e6fa !important; }
+.dark .sidebar-sublink:hover { background: #253051 !important; color: #88cdf6 !important; }
+.dark .mobile-hamburger { background: #232a37 !important; color: #e4e9f0 !important; }
+
+/* === Header === */
+.dark .header {
+  background: #232a37 !important;
+  color: #e9eaf0 !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.24);
+}
+.dark .theme-toggle,
+.dark .logout-btn {
+  color: #e5e8f0 !important;
+  background: none !important;
+}
+.dark .logout-btn { background: #232a37 !important; color: #e69393 !important; }
+.dark .logout-btn:hover { background: #371a1a !important; color: #fad1d2 !important; }
+
+/* === Stat Cards/Sections === */
+.dark .stat-card { background: #232a37 !important; }
+.dark .stat-meta h3 { color: #adbadb !important; }
+.dark .stat-meta .value { color: #f1f4fa !important; }
+.dark .stats-grid { background: transparent !important; }
+.dark .section-head h2 { color: #f1f4fa !important; }
+.dark select { background: #232a37 !important; color: #f1f4fa !important; border-color: #293041 !important; }
+
+/* === Category Table (Dashboard) === */
+.dark .category-table th,
+.dark .category-table td { background: #232a37 !important; color: #eaedf4 !important; }
+.dark .category-table th { color: #ccd6ef !important; }
+.dark .category-table tr:hover { background: #212940 !important; }
+
+/* === Category Card Rows === */
+.dark .category-row { background: #232a37 !important; }
+.dark .cat-label { color: #eaf1fe !important; }
+.dark .amt { color: #e0eaff !important; }
+.dark .pct { color: #b8c3d8 !important; }
+.dark .no-data { color: #b1b8c3 !important; }
+
+/* === Transactions Table === */
+.dark .transactions-section th { background: #232a37 !important; color: #b3bad3 !important; }
+.dark .transactions-section td,
+.dark .transactions-section tr {
+  background: #232a37 !important;
+  color: #e3e6fc !important;
+  border-bottom: 1px solid #293041 !important;
+}
+.dark .transactions-section tr:hover { background: #212940 !important; }
+
+/* === Dashboard Layout === */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f5f5;
+  width: 100vw;
+  overflow-x: hidden;
+}
+.main-panel {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: margin-left 0.32s cubic-bezier(.4,0,.2,1);
+  background: transparent;
+}
+.ml-64 { margin-left: 10rem !important; }
+.ml-16 { margin-left: 2rem !important; }
+@media (max-width: 900px) { .main-panel { margin-left: 0 !important; } }
+.dashboard-content {
+  flex: 1;
+  min-width: 0;
+  width: 100vw;
+  padding-top: 72px;
+  padding-right: 2vw;
+  padding-left: 2vw;
+  padding-bottom: 1.5vw;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+/* == Responsive tweaks == */
+@media (max-width: 600px) {
+  .header { padding: 0 .5rem; height: 52px; }
+  .header-actions { gap: .7rem; }
+  .logout-label { display: none; }
+  .category-table th, .category-table td { padding: 0.7em 0.3em; font-size: 0.97em; }
+  .dashboard-home { padding: .8em .2em !important; }
+}
+@media (max-width: 700px) {
+  .transactions-section th, .transactions-section td {
+    padding-left: 0.8em; padding-right: 0.8em; font-size: .97em;
+  }
+  .transactions-section table { min-width: 0 !important; width:100% !important; }
+  .section-head { flex-direction:column; gap:.7em; }
+  .dashboard-home { padding: .8em .2em !important; }
+}
+
+/* === Extra Sidebar Dark Mode Fixes === */
+.dark .sidebar-link,
+.dark .sidebar-label,
+.dark .sidebar-header,
+.dark .brand,
+.dark .sidebar-toggle-btn,
+.dark .sidebar-close-btn,
+.dark .sidebar-sublink,
+.dark .sidebar-nav {
+  color: #fff !important;
+  background: #232a37 !important;
+}
+.dark .sidebar-icon,
+.dark .sidebar-link .sidebar-icon,
+.dark .sidebar-header svg,
+.dark .sidebar-link svg,
+.dark .dropdown-arrow {
+  color: #fff !important;
+  stroke: #fff !important;
+  fill: none !important;
+}
+.dark .mobile-hamburger {
+  background: #232a37 !important;
+  color: #fff !important;
+}
+.dark .sidebar-link.active,
+.dark .sidebar-link:hover {
+  color: #61aae7 !important;
+  background: #283043 !important;
+}
+.dark .sidebar-sublink:hover {
+  background: #283043 !important;
+  color: #61aae7 !important;
+}
+.dark .sidebar-collapsed .sidebar-label,
+.dark .sidebar-collapsed .sidebar-link,
+.dark .sidebar-collapsed .sidebar-icon {
+  color: #fff !important;
+}
+.dark .sidebar-overlay {
+  background: #000d !important;
+}
+
+/* --- Misc section cards/tables --- */
+.dark .report-card,
+.dark .chart-card,
+.dark .report-table-card,
+.dark .report-empty {
+  background: #20283e !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+.dark .report-title,
+.dark .report-table-title,
+.dark .chart-title {
+  color: #fff !important;
+  border-bottom: none !important;
+}
+.dark .report-table th,
+.dark .report-table td {
+  background: #232a37 !important;
+  color: #fff !important;
+  border: none !important;
+}
+.dark .report-table tr {
+  background: #20283e !important;
+  border: none !important;
+}
+.dark .report-table tbody tr:hover,
+.dark .row-selected {
+  background: #263052 !important;
+  border: none !important;
+}
+.dark .change-badge,
+.dark .badge-pos,
+.dark .badge-neg,
+.dark .badge-neutral {
+  background: #232a37 !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+/* Remove chart borders in dark */
+.dark #pieChart svg path,
+.dark #barChart svg path,
+.dark #comparisonChart svg path {
+  stroke: #20283e !important;
+  border: none !important;
+}
+.dark .report-error-content,
+.dark .report-empty { border: none !important; }
+
+/* ============================================================
+   FINAL OVERRIDE: Force ALL text to white in dark mode
+   ============================================================ */
+.dark,
+.dark * {
+  color: #fff !important;
+}

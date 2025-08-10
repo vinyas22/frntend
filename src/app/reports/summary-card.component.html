@@ -1,0 +1,28 @@
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-400">{{ title }}</p>
+          <p class="text-2xl font-bold text-gray-900 dark:text-white" [class]="valueClass">
+            {{ value | currency:'INR':'symbol':'1.0-0' }}
+          </p>
+        </div>
+        <div class="p-3 rounded-full" [class]="iconBgClass">
+          <ng-content select="[slot=icon]"></ng-content>
+        </div>
+      </div>
+      
+      <div *ngIf="comparison !== undefined" class="mt-4 flex items-center text-sm">
+        <span class="flex items-center" 
+              [class.text-green-600]="comparison > 0"
+              [class.text-red-600]="comparison < 0"
+              [class.text-gray-500]="comparison === 0">
+          <svg *ngIf="comparison > 0" class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3.293 9.707a1 1 0 010-1.414l6-6a1 1 0 011.414 0l6 6a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L4.707 9.707a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+          </svg>
+          <svg *ngIf="comparison < 0" class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+          </svg>
+          <span>{{ comparison | percentage }}{{ comparisonText }}</span>
+        </span>
+      </div>
+    </div>
