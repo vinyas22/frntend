@@ -2,16 +2,15 @@
   "name": "frntend",
   "version": "0.0.0",
   "scripts": {
-  "ng": "ng",
-  "start": "ng serve",
-  "build": "ng build --configuration production",
-  "watch": "ng build --watch --configuration development",
-  "test": "ng test",
-  "vercel-build": "npm install --legacy-peer-deps && ng build --configuration production",
-  "build:ssr": "ng build --configuration production && ng run frntend:server:production",
-  "serve:ssr": "node dist/frntend/server/server.mjs"
-}
-,
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build --configuration production",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "vercel-build": "npm install --legacy-peer-deps && ng build --configuration production",
+    "build:ssr": "ng build --configuration production && ng run frntend:server:production",
+    "serve:ssr": "node dist/frntend/server/server.mjs"
+  },
   "private": true,
   "dependencies": {
     "@angular/animations": "^17.3.0",
