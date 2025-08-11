@@ -1,5 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, Inject, LOCALE_ID } from '@angular/core';
-import { CommonModule, formatDate } from '@angular/common';
+import { Component, OnInit, ChangeDetectorRef, Inject, LOCALE_ID, PLATFORM_ID } from '@angular/core';
+import { CommonModule, formatDate, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NgxEchartsModule } from 'ngx-echarts';
 import { EChartsOption } from 'echarts';
@@ -38,7 +38,8 @@ export class YearlyReportComponent implements OnInit {
   constructor(
     private reportService: ReportService,
     private cdr: ChangeDetectorRef,
-    @Inject(LOCALE_ID) private locale: string
+    @Inject(LOCALE_ID) private locale: string,
+    @Inject(PLATFORM_ID) private platformId: Object // Add PLATFORM_ID injection
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -355,6 +356,14 @@ export class YearlyReportComponent implements OnInit {
     }
   }
 
-  exportToPDF(): void { window.print(); }
-  shareReport(): void { /* implement if needed */ }
+  // SSR-safe print method!
+  exportToPDF(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      window.print();
+    }
+  }
+
+  shareReport(): void {
+    // implement if needed
+  }
 }

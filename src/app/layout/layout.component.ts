@@ -1,4 +1,5 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, Inject, PLATFORM_ID, OnInit } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SharedModule } from '../shared/shared.module';
 import { HeaderComponent } from './header/header.component';
@@ -11,32 +12,38 @@ import { NotificationBellComponent } from '../notifications/notification-bell/no
   standalone: true,
   styleUrls: ['./layout.component.scss'],
   imports: [
-    SharedModule, // Must include NotificationBell if that's where it lives
+    SharedModule,
     RouterOutlet,
     HeaderComponent,
     SidebarComponent,
-    NotificationBellComponent // Remove this if handled in SharedModule
+    NotificationBellComponent
   ],
   templateUrl: './layout.component.html',
 })
-export class LayoutComponent {
+export class LayoutComponent implements OnInit {
   isSidebarCollapsed = false;
 
   // Responsive sidebar/mobile
-  isMobile = window.innerWidth <= 900;
+  isMobile = false; // set default; we’ll set proper value in ngOnInit
   showMobileSidebar = false;
-  
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.isMobile = window.innerWidth <= 900;
+    }
+  }
+
   // Toggle sidebar collapsed state (desktop)
   onSidebarCollapse(collapsed: boolean) {
     this.isSidebarCollapsed = collapsed;
   }
 
-  // Optionally triggered by hover (if you use this)
   onSidebarHover(collapsed: boolean) {
     this.isSidebarCollapsed = collapsed;
   }
 
-  // Toggle sidebar (open/hide for both mobile and desktop)
   toggleSidebar() {
     if (this.isMobile) {
       this.showMobileSidebar = !this.showMobileSidebar;
@@ -45,12 +52,10 @@ export class LayoutComponent {
     }
   }
 
-  // Mobile overlay/click closes sidebar
   closeMobileSidebar() {
     this.showMobileSidebar = false;
   }
 
-  // Optional: open explicitly on mobile (ex: hamburger)
   openMobileSidebar() {
     this.showMobileSidebar = true;
   }
@@ -58,22 +63,21 @@ export class LayoutComponent {
   // Responsive check: update isMobile on resize
   @HostListener('window:resize')
   onResize() {
-    this.isMobile = window.innerWidth <= 900;
-    if (!this.isMobile) {
-      this.showMobileSidebar = false;
+    if (isPlatformBrowser(this.platformId)) {
+      this.isMobile = window.innerWidth <= 900;
+      if (!this.isMobile) {
+        this.showMobileSidebar = false;
+      }
     }
   }
 
-  // Demo theme toggle
   toggleDarkMode() {
-    document.body.classList.toggle('dark');
+    if (isPlatformBrowser(this.platformId)) {
+      document.body.classList.toggle('dark');
+    }
   }
 
-  // Dummy logout (replace with your auth service logic)
   logout() {
-    // Do actual logout here
-    // e.g. this.authService.logout();
-    // this.router.navigate(['/login']);
     console.log('Logging out');
   }
 }
