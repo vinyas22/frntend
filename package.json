@@ -4,10 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-  "build": "ng build --configuration production"
-,    "watch": "ng build --watch --configuration development",
+    "build": "ng build --configuration production",
+    "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:frntend": "node dist/frntend/server/server.mjs"
+    "serve:ssr:frntend": "node dist/frntend/server/server.mjs",
+    "vercel-build": "npm install --legacy-peer-deps && ng build --configuration production"
   },
   "private": true,
   "dependencies": {
