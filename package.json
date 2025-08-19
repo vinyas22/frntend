@@ -3,11 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "ng": "node ./node_modules/@angular/cli/bin/ng.js",
-    "start": "npm run serve:ssr",
-    "build": "npm run ng build",
-    "build:ssr": "npm run ng build -- --configuration=production && npm run ng run frntend:server:production",
-    "serve:ssr": "node dist/server/main.js"
+    "ng": "npx ng",
+    "start": "npx ng serve",
+    "build": "npx ng build --configuration=production",
+    "watch": "npx ng build --watch --configuration=development",
+    "test": "npx ng test",
+    "serve:ssr": "node dist/frntend/server/main.js",
+    "build:ssr": "npx ng build --configuration=production && npx ng run frntend:server:production",
+    "prerender": "npx ng run frntend:prerender"
   },
   "dependencies": {
     "@angular/animations": "^17.0.0",
@@ -17,21 +20,16 @@
     "@angular/forms": "^17.0.0",
     "@angular/platform-browser": "^17.0.0",
     "@angular/platform-browser-dynamic": "^17.0.0",
-    "@angular/platform-server": "^17.0.0",
     "@angular/router": "^17.0.0",
-    "@nguniversal/express-engine": "^17.0.0",
-    "express": "^4.19.2",
-    "rxjs": "^7.8.1",
-    "tslib": "^2.6.2",
-    "zone.js": "^0.14.2"
+    "rxjs": "~7.8.0",
+    "zone.js": "~0.13.0",
+    "tslib": "^2.5.0",
+    "@angular/cli": "^17.0.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.0.0",
-    "@angular/cli": "^17.0.0",
     "@angular/compiler-cli": "^17.0.0",
-    "typescript": "^5.3.0"
-  },
-  "engines": {
-    "node": "22.x"
+    "@types/node": "^20.0.0",
+    "typescript": "~5.1.3"
   }
 }
