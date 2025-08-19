@@ -99,24 +99,23 @@
             "scripts": []
           }
         },
-"server": {
-  "builder": "@angular-devkit/build-angular:server",
-  "options": {
-    "outputPath": "dist/server",
-    "main": "src/main.server.ts",
-    "tsConfig": "tsconfig.server.json"
-  },
-  "configurations": {
-    "production": {
-      "optimization": true,
-      "sourceMap": false,
-      "extractLicenses": true,
-      "outputHashing": "media"
-    }
-  },
-  "defaultConfiguration": "production"
-}
-
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/server",
+            "main": "src/main.server.ts",
+            "tsConfig": "tsconfig.server.json"
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "sourceMap": false,
+              "extractLicenses": true,
+              "outputHashing": "media"
+            }
+          },
+          "defaultConfiguration": "production"
+        }
       }
     }
   },
