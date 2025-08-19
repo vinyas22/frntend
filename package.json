@@ -1,38 +1,37 @@
 {
   "name": "frntend",
   "version": "0.0.0",
-  "scripts": {
-    "ng": "npx ng",
-    "start": "npx ng serve",
-    "build": "npx ng build",
-    "watch": "npx ng build --watch --configuration development",
-    "test": "npx ng test",
-    "build:ssr": "npx ng build && npx ng run frntend:server",
-    "serve:ssr": "node dist/frntend/server/main.mjs"
-  },
   "private": true,
+  "scripts": {
+    "ng": "node ./node_modules/@angular/cli/bin/ng.js",
+    "start": "npm run serve:ssr",
+    "build": "npm run ng build",
+    "build:ssr": "npm run ng build -- --configuration=production && npm run ng run frntend:server:production",
+    "serve:ssr": "node dist/server/main.js"
+  },
   "dependencies": {
-    "@angular/animations": "^17.3.0",
-    "@angular/common": "^17.3.0",
-    "@angular/compiler": "^17.3.0",
-    "@angular/core": "^17.3.0",
-    "@angular/forms": "^17.3.0",
-    "@angular/platform-browser": "^17.3.0",
-    "@angular/platform-browser-dynamic": "^17.3.0",
-    "@angular/platform-server": "^17.3.0",
-    "@angular/router": "^17.3.0",
-    "@nguniversal/express-engine": "^17.3.0",
-    "express": "^4.19.0",
-    "rxjs": "~7.8.1",
+    "@angular/animations": "^17.0.0",
+    "@angular/common": "^17.0.0",
+    "@angular/compiler": "^17.0.0",
+    "@angular/core": "^17.0.0",
+    "@angular/forms": "^17.0.0",
+    "@angular/platform-browser": "^17.0.0",
+    "@angular/platform-browser-dynamic": "^17.0.0",
+    "@angular/platform-server": "^17.0.0",
+    "@angular/router": "^17.0.0",
+    "@nguniversal/express-engine": "^17.0.0",
+    "express": "^4.19.2",
+    "rxjs": "^7.8.1",
     "tslib": "^2.6.2",
-    "zone.js": "~0.14.2"
+    "zone.js": "^0.14.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^17.3.0",
-    "@angular/cli": "^17.3.0",
-    "@angular/compiler-cli": "^17.3.0",
-    "@types/express": "^4.17.21",
-    "@types/node": "^20.11.30",
-    "typescript": "~5.4.0"
+    "@angular-devkit/build-angular": "^17.0.0",
+    "@angular/cli": "^17.0.0",
+    "@angular/compiler-cli": "^17.0.0",
+    "typescript": "^5.3.0"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }
