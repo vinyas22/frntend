@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BillsService } from '../../services/bills.service';
 import { CommonModule } from '@angular/common';
-import { NgIconsModule } from '@ng-icons/core';
+// ✅ Removed NgIconsModule import
 
 @Component({
   selector: 'app-bill-entries',
   standalone: true,
-  imports: [CommonModule, NgIconsModule],
+  imports: [CommonModule], // ✅ Removed NgIconsModule
   templateUrl: './bill-entries.component.html',
   styleUrls: ['./bill-entries.component.scss'],
 })

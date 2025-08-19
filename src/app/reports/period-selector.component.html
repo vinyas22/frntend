@@ -10,7 +10,7 @@
           [disabled]="loading">
           <option value="">Choose {{ periodType }}...</option>
           <option *ngFor="let period of periods" [value]="period.value">
-            {{ period.label }} ({{ period.totalAmount | currency:'INR':'symbol':'1.0-0' }})
+            {{ period.label }} {{ period.totalAmount | currency:'INR':'symbol':'1.0-0' }}
           </option>
         </select>
       </div>

@@ -31,15 +31,17 @@ export class LoginComponent {
 
     this.loading = true;
     this.authService.login(this.loginForm.getRawValue()).subscribe({
-      next: (res: any) => {
-        this.authService.setToken(res.token);
-        this.router.navigate(['/dashboard']);
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = err?.error?.error || 'Login failed.';
-        this.loading = false;
-      }
-    });
+  next: (res: any) => {
+    this.authService.setToken(res.token);
+    console.log('✅ Token stored in localStorage:', localStorage.getItem('token')); // Debug line
+    this.router.navigate(['/dashboard']);
+    this.loading = false;
+  },
+  error: (err) => {
+    this.error = err?.error?.error || 'Login failed.';
+    this.loading = false;
+  }
+});
+
   }
 }

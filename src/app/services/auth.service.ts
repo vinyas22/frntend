@@ -35,10 +35,12 @@ export class AuthService {
   }
 
   logout(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      localStorage.removeItem('token');
-    }
+  if (isPlatformBrowser(this.platformId)) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('authToken'); // just in case
   }
+}
+
 
   // ---- Email verification ----
   verifyEmail(token: string): Observable<any> {

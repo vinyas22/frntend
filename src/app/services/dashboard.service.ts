@@ -3,9 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class DashboardService {
   private apiUrl = `${environment.apiUrl}/dashboard`;
 
@@ -25,37 +23,31 @@ export class DashboardService {
   getRecentTransactions(limit: number = 10): Observable<any> {
     return this.http.get(`${this.apiUrl}/recent-transactions?limit=${limit}`);
   }
-/** 🟢 Get Weekly Category Breakdown */
-getWeeklyBreakdown(): Observable<any> {
-  return this.getCategoryBreakdown('week');
-}
 
-/** 🔵 Get Monthly Category Breakdown */
-getMonthlyBreakdown(): Observable<any> {
-  return this.getCategoryBreakdown('month');
-}
+  /** 🟢 Get available quarters */
+  getAvailableQuarters(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/available-quarters`);
+  }
 
-/** 🟠 Get Quarterly Category Breakdown */
-getQuarterlyBreakdown(): Observable<any> {
-  return this.getCategoryBreakdown('quarter');
-}
+  /** 🟢 Get quarterly report by quarter */
+  getQuarterlyReport(quarter: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/quarterly-report?quarter=${quarter}`);
+  }
 
-/** 🟣 Get Yearly Category Breakdown */
-getYearlyBreakdown(): Observable<any> {
-  return this.getCategoryBreakdown('year');
-}
+  // Optional convenience methods for periods if you want
+  getWeeklyBreakdown(): Observable<any> {
+    return this.getCategoryBreakdown('week');
+  }
 
-/** 📑 Get Quarterly Report by year & quarter */
-/** 🟢 Get available quarters */
-getAvailableQuarters(): Observable<any> {
-  return this.http.get(`${this.apiUrl}/available-quarters`);
-}
+  getMonthlyBreakdown(): Observable<any> {
+    return this.getCategoryBreakdown('month');
+  }
 
-/** 🟢 Get quarterly report by quarter */
-getQuarterlyReport(quarter: string): Observable<any> {
-  return this.http.get(`${this.apiUrl}/quarterly-report?quarter=${quarter}`);
-}
+  getQuarterlyBreakdown(): Observable<any> {
+    return this.getCategoryBreakdown('quarter');
+  }
 
-/** 📑 Get Yearly Report */
-  
+  getYearlyBreakdown(): Observable<any> {
+    return this.getCategoryBreakdown('year');
+  }
 }

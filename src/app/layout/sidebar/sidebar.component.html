@@ -5,8 +5,8 @@
   *ngIf="isMobile && !showMobileSidebar"
   (click)="openMobileSidebar()"
 >
-  <svg width="28" height="28" stroke="currentColor" stroke-width="2">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h20M4 14h20M4 21h20"/>
+  <svg width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"/>
   </svg>
 </button>
 
@@ -29,6 +29,7 @@
   <!-- Sidebar Header -->
   <div class="sidebar-header">
     <span class="brand" [class.collapsed]="isCollapsed && !isMobile">MyApp</span>
+    
     <!-- Collapse/expand button (desktop only) -->
     <button
       *ngIf="!isMobile"
@@ -37,10 +38,11 @@
       aria-label="Toggle Sidebar"
       (click)="layoutService.toggleSidebar(!isCollapsed)"
     >
-      <svg width="24" height="24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16"/>
+      <svg width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/>
       </svg>
     </button>
+    
     <!-- Mobile close button (sidebar X) -->
     <button
       *ngIf="isMobile"
@@ -48,62 +50,86 @@
       (click)="closeMobileSidebar()"
       aria-label="Close sidebar"
     >
-      <svg width="26" height="26" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      <svg width="20" height="20" stroke="currentColor" stroke-width="2" fill="none">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18 6L6 18M6 6l12 12"/>
       </svg>
     </button>
   </div>
 
   <!-- Navigation -->
   <nav class="sidebar-nav">
-    <a routerLink="/dashboard" routerLinkActive="active"
+    <!-- Dashboard Link -->
+    <a routerLink="/dashboard" 
+       routerLinkActive="active"
        class="sidebar-link"
        (click)="isMobile && closeMobileSidebar()">
-      <ng-icon name="HeroHome" class="sidebar-icon"></ng-icon>
+      <!-- Dashboard Icon -->
+      <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+        <polyline points="9,22 9,12 15,12 15,22"></polyline>
+      </svg>
       <span class="sidebar-label" [class.hide]="isCollapsed && !isMobile">Dashboard</span>
     </a>
+
     <!-- Entries Dropdown -->
     <button type="button" class="sidebar-link"
-      (click)="entriesDropdown = !entriesDropdown">
-      <ng-icon name="HeroDocumentText" class="sidebar-icon"></ng-icon>
+            (click)="entriesDropdown = !entriesDropdown">
+      <!-- Document Icon -->
+      <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14,2 14,8 20,8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10,9 9,9 8,9"></polyline>
+      </svg>
       <span class="sidebar-label" [class.hide]="isCollapsed && !isMobile">Entries</span>
-      <svg class="dropdown-arrow" [class.open]="entriesDropdown" width="19" height="19">
-        <path d="M6 8l4 4 4-4"/>
+      <svg class="dropdown-arrow" [class.open]="entriesDropdown" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6,9 12,15 18,9"></polyline>
       </svg>
     </button>
     <div class="sidebar-submenu"
-         [class.menu-open]="entriesDropdown && !isCollapsed && (!isMobile || showMobileSidebar)">
-      <a (click)="openAddEntry()" class="sidebar-sublink">Add Entry</a>
+         [class.menu-open]="entriesDropdown && (!isMobile || showMobileSidebar)">
+      <button (click)="openAddEntry()" class="sidebar-sublink">Add Entry</button>
     </div>
+
     <!-- Bills Dropdown -->
     <button type="button" class="sidebar-link"
-      (click)="billsDropdown = !billsDropdown">
-      <ng-icon name="HeroChartPie" class="sidebar-icon"></ng-icon>
+            (click)="billsDropdown = !billsDropdown">
+      <!-- Chart Pie Icon -->
+      <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+        <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+      </svg>
       <span class="sidebar-label" [class.hide]="isCollapsed && !isMobile">Bills</span>
-      <svg class="dropdown-arrow" [class.open]="billsDropdown" width="19" height="19">
-        <path d="M6 8l4 4 4-4"/>
+      <svg class="dropdown-arrow" [class.open]="billsDropdown" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6,9 12,15 18,9"></polyline>
       </svg>
     </button>
     <div class="sidebar-submenu"
-         [class.menu-open]="billsDropdown && !isCollapsed && (!isMobile || showMobileSidebar)">
-      <a (click)="openCreateMonthlySalary()" class="sidebar-sublink">Monthly Salary</a>
-      <a (click)="openUpdateBalance()" class="sidebar-sublink">Update Balance</a>
+         [class.menu-open]="billsDropdown && (!isMobile || showMobileSidebar)">
+      <button (click)="openCreateMonthlySalary()" class="sidebar-sublink">Monthly Salary</button>
+      <button (click)="openUpdateBalance()" class="sidebar-sublink">Update Balance</button>
     </div>
+
     <!-- Reports Dropdown -->
     <button type="button" class="sidebar-link"
-      (click)="reportsDropdown = !reportsDropdown">
-      <ng-icon name="HeroBell" class="sidebar-icon"></ng-icon>
+            (click)="reportsDropdown = !reportsDropdown">
+      <!-- Bell Icon -->
+      <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+      </svg>
       <span class="sidebar-label" [class.hide]="isCollapsed && !isMobile">Reports</span>
-      <svg class="dropdown-arrow" [class.open]="reportsDropdown" width="19" height="19">
-        <path d="M6 8l4 4 4-4"/>
+      <svg class="dropdown-arrow" [class.open]="reportsDropdown" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6,9 12,15 18,9"></polyline>
       </svg>
     </button>
     <div class="sidebar-submenu"
-         [class.menu-open]="reportsDropdown && !isCollapsed && (!isMobile || showMobileSidebar)">
-      <a (click)="openWeeklyReport()" class="sidebar-sublink">Weekly Report</a>
-      <a (click)="openMonthlyReport()" class="sidebar-sublink">Monthly Report</a>
-      <a (click)="openQuarterlyReport()" class="sidebar-sublink">Quarterly Report</a>
-      <a (click)="openYearlyReport()" class="sidebar-sublink">Yearly Report</a>
+         [class.menu-open]="reportsDropdown && (!isMobile || showMobileSidebar)">
+      <button (click)="openWeeklyReport()" class="sidebar-sublink">Weekly Report</button>
+      <button (click)="openMonthlyReport()" class="sidebar-sublink">Monthly Report</button>
+      <button (click)="openQuarterlyReport()" class="sidebar-sublink">Quarterly Report</button>
+      <button (click)="openYearlyReport()" class="sidebar-sublink">Yearly Report</button>
     </div>
   </nav>
 </aside>

@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
 styleUrls : ['./dashboard-home.component.scss'],
-  templateUrl: './dashboard-home.component.html'
+  templateUrl:   './dashboard-home.component.html'
 })
 export class DashboardHomeComponent implements OnInit, OnDestroy {
   stats: any = {};

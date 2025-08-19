@@ -28,7 +28,7 @@
     <div class="report-error-content">
       <span class="report-error-icon">&#9888;</span>
       <div>
-        <h3>Error Loading Report</h3>
+        <h4>Error Loading Report</h4>
         <p>{{ error }}</p>
         <button (click)="onRefresh()">Try again</button>
       </div>
@@ -48,8 +48,7 @@
       <div class="report-card">
         <app-summary-card
           title="Weekly Expenses"
-          [value]="!selectedCategory ? reportData.totalExpense : findCategoryAmount(filteredCategories, selectedCategory)"
-          [comparison]="expenseComparison"
+[value]="!selectedCategory ? (reportData?.totalExpense ?? 0) : (filteredExpense ?? 0)"          [comparison]="expenseComparison"
           type="expense"></app-summary-card>
       </div>
     </div>
@@ -66,21 +65,21 @@
       </div>
     </div>
 
-    <!-- Comparison Chart -->
-    <div class="report-card chart-card">
-      <div class="chart-title">Comparison Chart</div>
-      <div #comparisonChart id="comparisonChart" class="chart-container"></div>
-    </div>
+    <!-- ✅ REMOVED Comparison Chart Section Completely -->
 
-    <!-- Breakdown Table -->
+    <!-- Enhanced Daily Breakdown Table -->
     <div class="report-card report-table-card">
-      <div class="report-table-title">Category Breakdown</div>
-      <div class="report-table-wrapper">
+      <div class="report-table-title">
+        {{ selectedCategory ? selectedCategory + ' - Daily Breakdown' : 'Category Summary' }}
+      </div>
+      
+      <!-- Category Summary Table (when no category selected) -->
+      <div *ngIf="!selectedCategory" class="report-table-wrapper">
         <table class="report-table">
           <thead>
             <tr>
               <th>Category</th>
-              <th>Amount</th>
+              <th>Current Week</th>
               <th>Previous Week</th>
               <th>Change</th>
             </tr>
@@ -112,13 +111,63 @@
           </tbody>
         </table>
       </div>
+
+      <!-- Daily Breakdown Table (when category is selected) -->
+      <div *ngIf="selectedCategory" class="report-table-wrapper">
+        <table class="report-table daily-breakdown-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Day</th>
+              <th>Current Week ({{ selectedCategory }})</th>
+              <th>Previous Week ({{ selectedCategory }})</th>
+              <th>Difference</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dayData of getDailyBreakdownData()" 
+                [class.has-current]="dayData.currentAmount > 0"
+                [class.has-previous]="dayData.previousAmount > 0">
+              <td>{{ dayData.date | date:'shortDate' }}</td>
+              <td>{{ dayData.dayName }}</td>
+              <td class="amount" [class.zero-amount]="dayData.currentAmount === 0">
+                {{ dayData.currentAmount | currency:'INR':'symbol':'1.0-0' }}
+              </td>
+              <td class="amount" [class.zero-amount]="dayData.previousAmount === 0">
+                {{ dayData.previousAmount | currency:'INR':'symbol':'1.0-0' }}
+              </td>
+              <td class="amount">
+                <span [class.positive-diff]="dayData.difference > 0" 
+                      [class.negative-diff]="dayData.difference < 0"
+                      [class.neutral-diff]="dayData.difference === 0">
+                  {{ dayData.difference | currency:'INR':'symbol':'1.0-0' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="2"><strong>Total</strong></td>
+              <td class="amount"><strong>{{ getDailyBreakdownTotals().currentTotal | currency:'INR':'symbol':'1.0-0' }}</strong></td>
+              <td class="amount"><strong>{{ getDailyBreakdownTotals().previousTotal | currency:'INR':'symbol':'1.0-0' }}</strong></td>
+              <td class="amount">
+                <strong [class.positive-diff]="getDailyBreakdownTotals().totalDifference > 0" 
+                        [class.negative-diff]="getDailyBreakdownTotals().totalDifference < 0"
+                        [class.neutral-diff]="getDailyBreakdownTotals().totalDifference === 0">
+                  {{ getDailyBreakdownTotals().totalDifference | currency:'INR':'symbol':'1.0-0' }}
+                </strong>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
     </div>
   </div>
 
   <!-- Empty State -->
   <div *ngIf="!reportData && !loading && !error" class="report-card report-empty">
     <div class="empty-icon">&#128202;</div>
-    <h3>No data available</h3>
+    <h4>No data available</h4>
     <p>Select a week to view your report data.</p>
   </div>
 </div>

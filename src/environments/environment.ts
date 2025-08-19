@@ -1,5 +1,5 @@
 export const environment = {
-  production: false,
+  production: true,
   // socketUrl: 'http://localhost:5001',
   // apiUrl: 'http://localhost:5001/api' 
  socketUrl: 'wss://billsbackend-7n2f.onrender.com', 

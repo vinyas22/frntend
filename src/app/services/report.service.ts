@@ -10,6 +10,7 @@ import {
   QuarterPeriod, 
   YearPeriod 
 } from '../reports/models/report.interface';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -20,12 +21,49 @@ export class ReportService {
 
   constructor(private http: HttpClient) {}
 
-  // Weekly Reports
+  // ===== QUARTERLY REPORTS (FIXED) =====
+  getAvailableQuarters(): Observable<QuarterPeriod[]> {
+    this.setLoading(true);
+    return this.http.get<any>(`${this.apiUrl}/quarters/available`)
+      .pipe(
+        map(response => {
+          console.log('🔍 Quarters API Response:', response);
+          return response.data?.quarters || response.quarters || response || [];
+        }),
+        catchError(this.handleError),
+        map(data => { 
+          this.setLoading(false); 
+          return data; 
+        })
+      );
+  }
+
+  getQuarterlyReport(quarterValue: string): Observable<ReportData> {
+    this.setLoading(true);
+    console.log('📅 Requesting quarterly report for:', quarterValue);
+    
+    const params = new HttpParams().set('date', quarterValue);
+    
+    return this.http.get<any>(`${this.apiUrl}/quarterly`, { params })
+      .pipe(
+        map(response => {
+          console.log('📊 Quarterly API Response:', response);
+          return response.data || response;
+        }),
+        catchError(this.handleError),
+        map(data => { 
+          this.setLoading(false); 
+          return data; 
+        })
+      );
+  }
+
+  // ===== WEEKLY REPORTS =====
   getAvailableWeeks(): Observable<WeekPeriod[]> {
     this.setLoading(true);
     return this.http.get<any>(`${this.apiUrl}/weekly/available-periods`)
       .pipe(
-        map(response => response.data.periods),
+        map(response => response.data?.periods || response.periods || []),
         catchError(this.handleError),
         map(data => { this.setLoading(false); return data; })
       );
@@ -35,18 +73,18 @@ export class ReportService {
     this.setLoading(true);
     return this.http.get<any>(`${this.apiUrl}/weekly/data/${weekValue}`)
       .pipe(
-        map(response => response.data),
+        map(response => response.data || response),
         catchError(this.handleError),
         map(data => { this.setLoading(false); return data; })
       );
   }
 
-  // Monthly Reports
+  // ===== MONTHLY REPORTS =====
   getAvailableMonths(): Observable<MonthPeriod[]> {
     this.setLoading(true);
     return this.http.get<any>(`${this.apiUrl}/monthly/available-months`)
       .pipe(
-        map(response => response.data.periods),
+        map(response => response.data?.periods || response.periods || []),
         catchError(this.handleError),
         map(data => { this.setLoading(false); return data; })
       );
@@ -56,67 +94,53 @@ export class ReportService {
     this.setLoading(true);
     return this.http.get<any>(`${this.apiUrl}/monthly/data/${monthValue}`)
       .pipe(
-        map(response => response.data),
+        map(response => response.data || response),
         catchError(this.handleError),
         map(data => { this.setLoading(false); return data; })
       );
   }
 
-  // Quarterly Reports
+  // ===== YEARLY REPORTS =====
+// ===== YEARLY REPORTS (FIXED) =====
+getAvailableYears(): Observable<YearPeriod[]> {
+  this.setLoading(true);
+  return this.http.get<any>(`${this.apiUrl}/years/available`)
+    .pipe(
+      map(response => response.data?.years || response.years || []),
+      catchError(this.handleError),
+      map(data => { this.setLoading(false); return data; })
+    );
+}
 
-
-  // Yearly Reports
-  getAvailableYears(): Observable<YearPeriod[]> {
-    this.setLoading(true);
-    return this.http.get<any>(`${this.apiUrl}/years/available`)
-      .pipe(
-        map(response => response.data.years),
-        catchError(this.handleError),
-        map(data => { this.setLoading(false); return data; })
-      );
-  }
-
-  getYearlyReport(yearValue: string): Observable<ReportData> {
-    this.setLoading(true);
-    return this.http.get<any>(`${this.apiUrl}/yearly/data/${yearValue}`)
-      .pipe(
-        map(response => response.data),
-        catchError(this.handleError),
-        map(data => { this.setLoading(false); return data; })
-      );
-  }
-
- 
-
+getYearlyReport(yearValue: string): Observable<ReportData> {
+  this.setLoading(true);
+  console.log('📅 Requesting yearly report for:', yearValue);
   
-  // Quarterly Reports
-   getAvailableQuarters(): Observable<QuarterPeriod[]> {
-    this.setLoading(true);
-    return this.http.get<any>(`${this.apiUrl}/quarters/available`)
-      .pipe(
-        map(response => response.data.quarters),
-        catchError(this.handleError),
-        map(data => { this.setLoading(false); return data; })
-      );
-  }
- getQuarterlyReport(quarterValue: string): Observable<ReportData> {
-    this.setLoading(true);
-    return this.http.get<any>(`${this.apiUrl}/quarterly/data/${quarterValue}`)
-      .pipe(
-        map(response => response.data),
-        catchError(this.handleError),
-        map(data => { this.setLoading(false); return data; })
-      );
-  }
+  // ✅ FIX: Use query parameters instead of path parameters
+  const params = new HttpParams().set('date', yearValue);
+  
+  return this.http.get<any>(`${this.apiUrl}/yearly`, { params })
+    .pipe(
+      map(response => {
+        console.log('📊 Yearly API Response:', response);
+        return response.data || response;
+      }),
+      catchError(this.handleError),
+      map(data => { 
+        this.setLoading(false); 
+        return data; 
+      })
+    );
+}
 
-  // Weekly/Monthly/Yearly omitted here for brevity, but keep them as in your last code
 
-   private setLoading(loading: boolean): void {
+  private setLoading(loading: boolean): void {
     this.loadingSubject.next(loading);
   }
+
   private handleError = (error: any): Observable<never> => {
     this.setLoading(false);
-    console.error('Report service error:', error);
+    console.error('❌ Report service error:', error);
     throw error;
   }
 }
