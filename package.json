@@ -7,10 +7,7 @@
     "start": "npx ng serve",
     "build": "npx ng build --configuration=production",
     "watch": "npx ng build --watch --configuration=development",
-    "test": "npx ng test",
-    "serve:ssr": "node dist/frntend/server/main.js",
-    "build:ssr": "npx ng build --configuration=production && npx ng run frntend:server:production",
-    "prerender": "npx ng run frntend:prerender"
+    "test": "npx ng test"
   },
   "dependencies": {
     "@angular/animations": "^17.3.12",
@@ -21,15 +18,12 @@
     "@angular/forms": "^17.3.12",
     "@angular/platform-browser": "^17.3.12",
     "@angular/platform-browser-dynamic": "^17.3.12",
-    "@angular/platform-server": "^17.3.12",
     "@angular/router": "^17.3.12",
-    "@nguniversal/builders": "^16.2.0",
-    "@nguniversal/express-engine": "^16.2.0",
     "echarts": "^6.0.0",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
-    "ngx-echarts": "^20.0.2",
+    "ngx-echarts": "^19.0.0",
     "rxjs": "~7.8.0",
     "socket.io-client": "^4.8.1",
     "tslib": "^2.5.0",
