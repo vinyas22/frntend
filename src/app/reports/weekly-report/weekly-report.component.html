@@ -48,7 +48,7 @@
       <div class="report-card">
         <app-summary-card
           title="Weekly Expenses"
-[value]="!selectedCategory ? (reportData?.totalExpense ?? 0) : (filteredExpense ?? 0)"          [comparison]="expenseComparison"
+[value]="!selectedCategory ? reportData.totalExpense : filteredExpense"         [comparison]="expenseComparison"
           type="expense"></app-summary-card>
       </div>
     </div>
