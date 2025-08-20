@@ -47,7 +47,7 @@ export class WeeklyReportComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private reportService: ReportService,
-    private notificationService: NotificationService,
+    // private notificationService: NotificationService,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {}
@@ -91,7 +91,7 @@ export class WeeklyReportComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         error: (error) => {
           this.error = 'Failed to load available weeks';
-          this.notificationService.showError('Failed to load available weeks');
+          // this.notificationService.showError('Failed to load available weeks');
           console.error('Error loading weeks:', error);
         }
       });
@@ -121,12 +121,12 @@ export class WeeklyReportComponent implements OnInit, OnDestroy, AfterViewInit {
           this.loading = false;
           this.selectedCategory = null;
           setTimeout(() => this.initializeCharts(), 0);
-          this.notificationService.showSuccess('Weekly report loaded successfully');
+          // this.notificationService.showSuccess('Weekly report loaded successfully');
         },
         error: (error) => {
           this.loading = false;
           this.error = 'Failed to load weekly report data';
-          this.notificationService.showError('Failed to load weekly report');
+          // this.notificationService.showError('Failed to load weekly report');
           console.error('Error loading report:', error);
         }
       });
@@ -400,57 +400,67 @@ export class WeeklyReportComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private initDailyChart(): void {
-    if (!this.barChartRef || !this.reportData || !this.reportData.daily) return;
-    const chartElement = this.barChartRef.nativeElement;
-    if (this.dailyChart) this.dailyChart.dispose();
-    this.dailyChart = echarts.init(chartElement);
-    
-    let dailySource = this.reportData.daily;
-    
-    if (this.selectedCategory && this.reportData.detailed_daily) {
-      const dailyMap = new Map<string, number>();
-      this.reportData.detailed_daily
-        .filter((d: DetailedDaily) => d.category === this.selectedCategory)
-        .forEach((d: DetailedDaily) => {
-          const existing = dailyMap.get(d.date) || 0;
-          dailyMap.set(d.date, existing + (d.amount || 0));
-        });
-      
-      dailySource = Array.from(dailyMap.entries())
-        .map(([date, total]) => ({ date, total }))
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    }
-    
-    this.dailyChart.setOption({
-      title: {
-        text: this.selectedCategory
-          ? `Daily Expenses - ${this.selectedCategory}`
-          : 'Daily Expenses',
-        left: 'center',
-        textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
-      },
-      tooltip: {
-        trigger: 'axis',
-        formatter: function(params: any) {
-          return `${params[0].name}: ₹${params[0].value}`;
-        }
-      },
-      xAxis: {
-        type: 'category',
-        data: dailySource.map((d: DailyTotal) => new Date(d.date).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' }))
-      },
-      yAxis: {
-        type: 'value',
-        axisLabel: { formatter: '₹{value}' }
-      },
-      series: [{
-        name: 'Daily Expense',
-        type: 'bar',
-        data: dailySource.map((d: DailyTotal) => d.total),
-        itemStyle: { color: '#3B82F6' }
-      }]
-    });
+  if (!this.barChartRef || !this.reportData || !this.reportData.daily) return;
+
+  const chartElement = this.barChartRef.nativeElement;
+  if (this.dailyChart) this.dailyChart.dispose();
+  this.dailyChart = echarts.init(chartElement);
+
+  let dailySource = this.reportData.daily;
+
+  if (this.selectedCategory && this.reportData.detailed_daily) {
+    const dailyMap = new Map<string, number>();
+    this.reportData.detailed_daily
+      .filter((d: DetailedDaily) => d.category === this.selectedCategory)
+      .forEach((d: DetailedDaily) => {
+        const existing = dailyMap.get(d.date) || 0;
+        dailyMap.set(d.date, existing + (d.amount || 0));
+      });
+
+    dailySource = Array.from(dailyMap.entries())
+      .map(([date, total]) => ({ date, total }))
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }
+
+  this.dailyChart.setOption({
+    title: {
+      text: this.selectedCategory
+        ? `Daily Expenses - ${this.selectedCategory}`
+        : 'Daily Expenses',
+      left: 'center',
+      textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
+    },
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params: any) =>
+        `${params[0].name}: ₹${params[0].value}`
+    },
+    xAxis: {
+      type: 'category',
+      data: dailySource.map((d: DailyTotal) =>
+        new Date(d.date).toLocaleDateString('en-IN', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric'
+        })
+      )
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: { formatter: '₹{value}' }
+    },
+    series: [{
+      name: 'Daily Expense',
+      type: 'bar',
+      data: dailySource.map((d: DailyTotal) => d.total),
+      itemStyle: { color: '#3B82F6' }
+    }]
+  });
+
+  // 🔑 ensure rendering
+  this.dailyChart.resize();
+}
+
 
   private disposeCharts(): void {
     this.categoryChart?.dispose?.();
