@@ -69,15 +69,7 @@ export class ReportService {
       );
   }
 
-  getWeeklyReport(weekValue: string): Observable<ReportData> {
-    this.setLoading(true);
-    return this.http.get<any>(`${this.apiUrl}/weekly/data/${weekValue}`)
-      .pipe(
-        map(response => response.data || response),
-        catchError(this.handleError),
-        map(data => { this.setLoading(false); return data; })
-      );
-  }
+ 
 
   // ===== MONTHLY REPORTS =====
   getAvailableMonths(): Observable<MonthPeriod[]> {
@@ -111,26 +103,54 @@ getAvailableYears(): Observable<YearPeriod[]> {
       map(data => { this.setLoading(false); return data; })
     );
 }
+getWeeklyReport(weekValue: string): Observable<ReportData> {
+  this.setLoading(true);
+  return this.http.get<any>(`${this.apiUrl}/weekly/data/${weekValue}`).pipe(
+    map(response => {
+      const data: ReportData = response.data || response || {};
+      return {
+        ...data,
+        totalExpense: data.totalExpense ?? 0,
+        totalIncome: data.totalIncome ?? 0,
+        savings: data.savings ?? 0,
+        savingsRate: data.savingsRate ?? 0,
+        daily: data.daily ?? [],
+        category: data.category ?? [],
+        previousWeek: data.previousWeek ?? {}
+      };
+    }),
+    catchError(this.handleError),
+    map(data => {
+      this.setLoading(false);
+      return data;
+    })
+  );
+}
 
 getYearlyReport(yearValue: string): Observable<ReportData> {
   this.setLoading(true);
-  console.log('📅 Requesting yearly report for:', yearValue);
-  
-  // ✅ FIX: Use query parameters instead of path parameters
   const params = new HttpParams().set('date', yearValue);
-  
-  return this.http.get<any>(`${this.apiUrl}/yearly`, { params })
-    .pipe(
-      map(response => {
-        console.log('📊 Yearly API Response:', response);
-        return response.data || response;
-      }),
-      catchError(this.handleError),
-      map(data => { 
-        this.setLoading(false); 
-        return data; 
-      })
-    );
+
+  return this.http.get<any>(`${this.apiUrl}/yearly`, { params }).pipe(
+    map(response => {
+      const data: ReportData = response.data || response || {};
+      return {
+        ...data,
+        totalExpense: data.totalExpense ?? 0,
+        totalIncome: data.totalIncome ?? 0,
+        savings: data.savings ?? 0,
+        savingsRate: data.savingsRate ?? 0,
+        monthly: data.monthly ?? [],
+        category: data.category ?? [],
+        previousYear: data.previousYear ?? {}
+      };
+    }),
+    catchError(this.handleError),
+    map(data => {
+      this.setLoading(false);
+      return data;
+    })
+  );
 }
 
 
