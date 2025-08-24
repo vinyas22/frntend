@@ -177,85 +177,77 @@
       </div>
     </div>
 
-    <!-- Category Details Table -->
-    <div class="category-details">
-      <div class="table-header">
-        <h3>Category Breakdown</h3>
-        <div class="filter-loading" *ngIf="isFilterLoading">
-          <span>Updating...</span>
-        </div>
-      </div>
-      
-      <div class="category-table">
-        <div class="table-header-row">
-          <span class="col-category">Category</span>
-          <span class="col-current">Current Quarter</span>
-          <span class="col-previous" *ngIf="fullReportData?.previousQuarter">Previous Quarter</span>
-          <span class="col-change" *ngIf="fullReportData?.previousQuarter">Change</span>
-          <span class="col-percentage">% of Total</span>
-        </div>
-        
-        <div class="table-row" 
-             *ngFor="let category of fullReportData?.category" 
-             [class.selected]="selectedCategoryFilter === (category.category || 'Uncategorized')"
-             (click)="toggleCategoryFilter(category.category || 'Uncategorized')">
-          
-          <span class="col-category">
-            <span class="category-name">{{ category.category || 'Uncategorized' }}</span>
-          </span>
-          
-          <span class="col-current">
-            {{ formatAsINR(category.amount || 0) }}
-          </span>
-          
-          <span class="col-previous" *ngIf="fullReportData?.previousQuarter">
-            {{ formatAsINR(getPreviousAmount(category.category || 'Uncategorized')) }}
-          </span>
-          
-          <span class="col-change" *ngIf="fullReportData?.previousQuarter"
-                [class.positive]="getChangeAmount(category.category || 'Uncategorized') < 0"
-                [class.negative]="getChangeAmount(category.category || 'Uncategorized') > 0">
-            {{ getChangeAmount(category.category || 'Uncategorized') > 0 ? '+' : '' }}{{ formatAsINR(getChangeAmount(category.category || 'Uncategorized')) }}
-          </span>
-          
-          <span class="col-percentage">
-            {{ getCategoryPercentage(category.amount || 0) }}%
-          </span>
-        </div>
-      </div>
+<!-- Category Details Table -->
+<div class="category-details overflow-x-auto rounded-lg border border-gray-200 shadow-md dark:border-gray-700 dark:bg-gray-800">
+  <div class="table-header flex justify-between items-center p-4">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Category Breakdown</h3>
+    <div *ngIf="isFilterLoading" class="text-sm text-gray-500 dark:text-gray-400">
+      Updating...
     </div>
+  </div>
 
-    <!-- Monthly Breakdown Table -->
-    <div class="monthly-breakdown">
-      <div class="breakdown-header">
-        <h3>Monthly Breakdown</h3>
-      </div>
-      
-      <div class="monthly-table">
-        <div class="monthly-table-header">
-          <span class="col-month">Month</span>
-          <span class="col-expenses">Expenses</span>
-          <span class="col-previous" *ngIf="fullReportData?.previousQuarter">Previous Quarter</span>
-          <span class="col-change" *ngIf="fullReportData?.previousQuarter">Change</span>
-        </div>
-        
-        <div class="monthly-table-row" *ngFor="let monthData of getMonthlyBreakdownData()">
-          <span class="col-month">{{ monthData.monthName }}</span>
-          <span class="col-expenses">{{ formatAsINR(monthData.currentAmount) }}</span>
-          <span class="col-previous" *ngIf="fullReportData?.previousQuarter">
-            {{ formatAsINR(monthData.previousAmount) }}
-          </span>
-          <span class="col-change" *ngIf="fullReportData?.previousQuarter"
-                [class.positive]="monthData.difference < 0"
-                [class.negative]="monthData.difference > 0">
-            {{ monthData.difference > 0 ? '+' : '' }}{{ formatAsINR(monthData.difference) }}
-          </span>
-        </div>
-      </div>
-    </div>
+  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+    <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Category</th>
+        <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Current Quarter</th>
+        <th *ngIf="fullReportData?.previousQuarter" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Previous Quarter</th>
+        <th *ngIf="fullReportData?.previousQuarter" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Change</th>
+        <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">% of Total</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+      <tr *ngFor="let category of fullReportData?.category"
+          (click)="toggleCategoryFilter(category.category || 'Uncategorized')"
+          [class.selected]="selectedCategoryFilter === (category.category || 'Uncategorized')"
+          class="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900 dark:text-gray-100">{{ category.category || 'Uncategorized' }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-right text-gray-900 dark:text-gray-100">{{ formatAsINR(category.amount || 0) }}</td>
+        <td *ngIf="fullReportData?.previousQuarter" class="px-6 py-4 whitespace-nowrap text-right text-gray-500 dark:text-gray-400">{{ formatAsINR(getPreviousAmount(category.category || 'Uncategorized')) }}</td>
+        <td *ngIf="fullReportData?.previousQuarter" class="px-6 py-4 whitespace-nowrap text-right"
+            [class.text-green-600]="getChangeAmount(category.category || 'Uncategorized') < 0"
+            [class.text-red-600]="getChangeAmount(category.category || 'Uncategorized') > 0">
+          {{ getChangeAmount(category.category || 'Uncategorized') > 0 ? '+' : '' }}{{ formatAsINR(getChangeAmount(category.category || 'Uncategorized')) }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-right text-gray-500 dark:text-gray-400">{{ getCategoryPercentage(category.amount || 0) }}%</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Monthly Breakdown Table -->
+<div class="monthly-breakdown mt-6 overflow-x-auto rounded-lg border border-gray-200 shadow-md dark:border-gray-700 dark:bg-gray-800">
+  <div class="breakdown-header p-4">
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Monthly Breakdown</h3>
+  </div>
+
+  <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+    <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Month</th>
+        <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Expenses</th>
+        <th *ngIf="fullReportData?.previousQuarter" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Previous Quarter</th>
+        <th *ngIf="fullReportData?.previousQuarter" class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Change</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+      <tr *ngFor="let monthData of getMonthlyBreakdownData()" class="hover:bg-gray-100 dark:hover:bg-gray-700">
+        <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900 dark:text-gray-100">{{ monthData.monthName }}</td>
+        <td class="px-6 py-4 whitespace-nowrap text-right text-gray-900 dark:text-gray-100">{{ formatAsINR(monthData.currentAmount) }}</td>
+        <td *ngIf="fullReportData?.previousQuarter" class="px-6 py-4 whitespace-nowrap text-right text-gray-500 dark:text-gray-400">{{ formatAsINR(monthData.previousAmount) }}</td>
+        <td *ngIf="fullReportData?.previousQuarter" class="px-6 py-4 whitespace-nowrap text-right"
+            [class.text-green-600]="monthData.difference < 0"
+            [class.text-red-600]="monthData.difference > 0">
+          {{ monthData.difference > 0 ? '+' : '' }}{{ formatAsINR(monthData.difference) }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 
     <!-- Detailed Category Breakdown -->
-    <div class="detailed-breakdown" *ngIf="selectedCategoryFilter">
+    <!-- <div class="detailed-breakdown" *ngIf="selectedCategoryFilter">
       <div class="breakdown-header">
         <h3>{{ selectedCategoryFilter }} - Monthly Details</h3>
         <button class="close-breakdown" (click)="clearFilter()">✕</button>
@@ -303,7 +295,7 @@
           </span>
         </div>
       </div>
-    </div>
+    </div> -->
 
   </div>
 </div>

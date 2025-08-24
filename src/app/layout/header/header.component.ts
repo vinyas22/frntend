@@ -3,6 +3,7 @@ import { LayoutService } from '../layout.service';
 import { NotificationBellComponent } from '../../notifications/notification-bell/notification-bell.component';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { ThemeService } from '../../services/ThemeService';
 
 @Component({
   selector: 'app-header',
@@ -18,7 +19,7 @@ export class HeaderComponent {
   constructor(
     private layoutService: LayoutService,
     private authService: AuthService,
-    private router: Router
+    private router: Router, private themeService: ThemeService
   ) {
     this.layoutService.sidebarCollapsed$.subscribe(val => {
       this.isCollapsed = val;
@@ -34,6 +35,8 @@ toggleDarkMode() {
     document.documentElement.classList.remove('dark');
     console.log('Dark mode OFF: .dark removed from <html>');
   }
+    this.themeService.setDarkMode(this.darkMode);
+
 }
 
 

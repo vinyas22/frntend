@@ -17,6 +17,7 @@ html, body {
 }
 *, *::before, *::after { box-sizing: inherit; }
 
+
 /* =============================================================
    DARK MODE: Universal Palette (.dark on <html>)
    ============================================================= */
@@ -231,8 +232,403 @@ html, body {
 
 /* ============================================================
    FINAL OVERRIDE: Force ALL text to white in dark mode
-   ============================================================ */
+   ============================================================= */
 .dark,
 .dark * {
   color: #fff !important;
+}
+
+/* --- Quarterly Report Container and Sections --- */
+.quarterly-report-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Jost', sans-serif !important;
+  font-weight: 400 !important;
+  *, *::before, *::after {
+    font-family: inherit !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+  }
+}
+
+.dark .quarterly-report-container {
+  background-color: #232a37 !important;
+  color: #e9eaf0 !important;
+}
+
+/* Header Section */
+.report-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.dark .report-header {
+  background: linear-gradient(135deg, #232a37 0%, #283043 100%) !important;
+  border: 1px solid #283043 !important;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.dark .header-content {
+  color: #e9eaf0 !important;
+}
+
+/* Report title */
+.report-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.dark .report-title {
+  background: none !important;
+  -webkit-text-fill-color: #f1f4fa !important;
+  color: #f1f4fa !important;
+}
+
+/* Year Selector */
+.year-selector {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+}
+
+.dark .year-selector {
+  background: #232a37 !important;
+  box-shadow: none !important;
+  border: 1px solid #283043 !important;
+}
+
+.year-selector label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.dark .year-selector label {
+  color: #adbadb !important;
+}
+
+.year-dropdown {
+  padding: 10px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 180px;
+  background: white;
+  color: #1e293b;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.dark .year-dropdown {
+  background: #232a37 !important;
+  border-color: #293041 !important;
+  color: #e9eaf0 !important;
+}
+
+.year-dropdown:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+// Add all other dark mode overrides similarly,
+// including for overview cards, stat cards, charts containers, tables, buttons, etc., following the examples above.
+
+/* Stat Cards */
+.overview-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .overview-card {
+  background: #232a37 !important;
+  border-color: #283043 !important;
+  box-shadow: none !important;
+  color: #e9eaf0 !important;
+}
+
+/* Stat Card types */
+.stat-item.income {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+}
+
+.dark .stat-item.income {
+  background: linear-gradient(135deg, #134e3b 0%, #047857 100%) !important;
+  color: #d1fae5 !important;
+  box-shadow: none !important;
+}
+
+.stat-item.expense {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+}
+
+.dark .stat-item.expense {
+  background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important;
+  color: #fee2e2 !important;
+  box-shadow: none !important;
+}
+
+.stat-item.savings {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+}
+
+.dark .stat-item.savings {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
+  color: #dbeafe !important;
+  box-shadow: none !important;
+}
+
+.stat-item.savings-rate {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
+}
+
+.dark .stat-item.savings-rate {
+  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%) !important;
+  color: #ede9fe !important;
+  box-shadow: none !important;
+}
+
+/* Remaining styles and their dark mode overrides follow this pattern */
+
+/* DARK MODE: Category breakdown table */
+.dark .category-details {
+  background: #232a37 !important;
+  color: #e9eaf0 !important;
+  border-color: #283043 !important;
+}
+
+.dark .category-details .category-table {
+  background: transparent !important;
+}
+
+.dark .category-details .table-header-row {
+  background: #2a3350 !important;
+  color: #bfcbe8 !important;
+  border-bottom: 1px solid #283043 !important;
+}
+
+.dark .category-details .table-row {
+  background: transparent !important;
+  color: #e9eaf0 !important;
+  border-bottom: 1px solid #283043 !important;
+}
+
+.dark .category-details .table-row.selected {
+  background: #39475b !important;
+  border-left: 4px solid #6366f1 !important;
+}
+
+.dark .category-details .table-row:hover {
+  background: #39475b !important;
+}
+
+.dark .category-details .col-category,
+.dark .category-details .category-name,
+.dark .category-details .col-current,
+.dark .category-details .col-previous,
+.dark .category-details .col-change,
+.dark .category-details .col-percentage {
+  color: #e9eaf0 !important;
+}
+
+.dark .category-details .col-change.positive {
+  color: #4ade80 !important;
+}
+.dark .category-details .col-change.negative {
+  color: #f87171 !important;
+}
+/* DARK MODE: Monthly breakdown table */
+.dark .monthly-breakdown {
+  background: #232a37 !important;
+  color: #e9eaf0 !important;
+  border-color: #283043 !important;
+}
+
+.dark .monthly-breakdown .monthly-table-header {
+  background: #2a3350 !important;
+  color: #bfcbe8 !important;
+}
+.dark .monthly-breakdown .monthly-table-row {
+  background: transparent !important;
+  color: #e9eaf0 !important;
+  border-bottom: 1px solid #283043 !important;
+}
+.dark .monthly-breakdown .monthly-table-row:nth-child(even) {
+  background: #2b3350 !important;
+}
+.dark .monthly-breakdown .monthly-table-row:hover {
+  background: #39475b !important;
+}
+
+/* Same pattern for .detailed-breakdown, .detailed-monthly-table, etc */
+/* Detailed Breakdown Container (dark modal) */
+.dark .detailed-breakdown {
+  background: #232a37 !important;
+  color: #e9eaf0 !important;
+  border-color: #283043 !important;
+}
+
+/* Header bar and close button */
+.dark .detailed-breakdown .breakdown-header {
+  border-bottom: 1px solid #283043 !important;
+  color: #f1f4fa !important;
+}
+
+.dark .detailed-breakdown .close-breakdown {
+  background: #283043 !important;
+  border: 1px solid #6366f1 !important; /* indigo accent */
+  color: #e9eaf0 !important;
+}
+
+.dark .detailed-breakdown .close-breakdown:hover {
+  background: #6366f1 !important;
+  color: #fff !important;
+}
+
+/* Summary panel at top */
+.dark .detailed-breakdown .detailed-summary {
+  background: #263052 !important;
+  border-color: #283043 !important;
+  box-shadow: none !important;
+}
+
+.dark .detailed-breakdown .summary-stats {
+  /* optional: remove background on grid to match new dark bg */
+  background: transparent !important;
+}
+
+/* Individual summary cards */
+.dark .detailed-breakdown .summary-item {
+  background: #232a37 !important;
+  border: 1px solid #39475b !important;
+  color: #e9eaf0 !important;
+}
+
+.dark .detailed-breakdown .summary-item.change-summary {
+  border-left: 4px solid #6366f1 !important; /* indigo highlight */
+}
+
+/* MONTHLY TABLE: */
+.dark .detailed-breakdown .detailed-monthly-table {
+  background: #232a37 !important;
+}
+
+.dark .detailed-breakdown .detailed-table-header {
+  background: #2a3350 !important;
+  color: #bfcbe8 !important;
+  border-bottom: 1px solid #283043 !important;
+}
+
+.dark .detailed-breakdown .detailed-table-row {
+  background: transparent !important;
+  color: #e9eaf0 !important;
+  border-bottom: 1px solid #283043 !important;
+}
+
+.dark .detailed-breakdown .detailed-table-row:nth-child(even) {
+  background: #2b3350 !important;
+}
+
+.dark .detailed-breakdown .detailed-table-row:hover {
+  background: #39475b !important;
+}
+
+.dark .detailed-breakdown .col-month,
+.dark .detailed-breakdown .col-current,
+.dark .detailed-breakdown .col-previous,
+.dark .detailed-breakdown .col-difference {
+  color: #e9eaf0 !important;
+}
+
+/* Optionally, add color variations for positive/negative differences */
+.dark .detailed-breakdown .col-difference.positive {
+  color: #4ade80 !important;
+}
+.dark .detailed-breakdown .col-difference.negative {
+  color: #f87171 !important;
+}
+.dark .chart-container {
+  background: #232a37 !important; /* Or your preferred dark card color */
+  border-color: #283043 !important;
+  color: #e9eaf0 !important;
+  box-shadow: none !important;
+}
+.dark .comparison-stats {
+  background: #232a37 !important;
+  color: #fff !important;
+  border-top: 1px solid #283043 !important;
+}
+
+.dark .comparison-grid {
+  background: transparent !important;
+}
+
+.dark .comparison-item {
+  background: #2a3350 !important;       /* A soft dark color for item cards */
+  border: 1px solid #283043 !important;
+  color: #e9eaf0 !important;
+  box-shadow: none !important;
+}
+
+.dark .comparison-item .label {
+  color: #bfcbe8 !important;
+}
+
+.dark .comparison-item .value {
+  color: #fff !important;              /* Or a highlight color for positive/negative if needed */
+}
+/* Make body and container fully dark in dark mode */
+.dark body,
+.dark .quarterly-report-container {
+  background-color: #232a37 !important;
+  color: #e9eaf0 !important;
+}
+.dark html {
+  background: #232a37 !important;
+}
+
+
+.dark .yearly-report-container {
+  background-color: #232f45 !important;
+  color: #e0e7ff !important;
 }

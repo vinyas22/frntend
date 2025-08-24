@@ -54,6 +54,8 @@ export interface DetailedMonthly {
   month: string;
   category: string;
   amount: number;
+   currentAmount: number;
+  previousAmount: number;
 }
 
 export interface QuarterlyTotal {

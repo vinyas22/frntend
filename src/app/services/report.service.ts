@@ -22,21 +22,19 @@ export class ReportService {
   constructor(private http: HttpClient) {}
 
   // ===== QUARTERLY REPORTS (FIXED) =====
-  getAvailableQuarters(): Observable<QuarterPeriod[]> {
-    this.setLoading(true);
-    return this.http.get<any>(`${this.apiUrl}/quarters/available`)
-      .pipe(
-        map(response => {
-          console.log('🔍 Quarters API Response:', response);
-          return response.data?.quarters || response.quarters || response || [];
-        }),
-        catchError(this.handleError),
-        map(data => { 
-          this.setLoading(false); 
-          return data; 
-        })
-      );
-  }
+getAvailableQuarters(): Observable<QuarterPeriod[]> {
+  this.setLoading(true);
+  return this.http.get<any>(`${this.apiUrl}/quarters/available`)
+    .pipe(
+      map(response => response.data?.quarters || response.quarters || response || []),
+      catchError(this.handleError),
+      map(data => {
+        this.setLoading(false);
+        return data;
+      })
+    );
+}
+
 
   getQuarterlyReport(quarterValue: string): Observable<ReportData> {
     this.setLoading(true);

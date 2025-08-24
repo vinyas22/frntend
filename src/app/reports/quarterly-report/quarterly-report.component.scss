@@ -860,3 +860,168 @@ font-family: 'Jost', sans-serif !important;
     }
   }
 }
+/* === Light Mode styles (your existing ones) --- */
+/* ... your current styles ... */
+
+/* === Dark Mode Overrides --- */
+.dark .yearly-report-container {
+  background-color: #232a37 !important;
+  color: #e9eaf0 !important;
+}
+
+.dark .report-header {
+  background: linear-gradient(135deg, #232a37 0%, #283043 100%) !important;
+  border: 1px solid #283043 !important;
+  box-shadow: none !important;
+  color: #e9eaf0 !important;
+}
+
+.dark .header-content {
+  color: #e9eaf0 !important;
+}
+
+.dark .report-title {
+  background: none !important;
+  -webkit-text-fill-color: #f1f4fa !important;
+  color: #f1f4fa !important;
+}
+
+.dark .year-selector {
+  background: #232a37 !important;
+  border: 1px solid #283043 !important;
+  box-shadow: none !important;
+}
+
+.dark .year-selector label {
+  color: #adbadb !important;
+}
+
+.dark .year-dropdown {
+  background: #232a37 !important;
+  border-color: #293041 !important;
+  color: #e9eaf0 !important;
+}
+
+.dark .loading-spinner span {
+  color: #a0aec0 !important;
+}
+
+/* Stat Cards */
+.dark .overview-card {
+  background: #232a37 !important;
+  border-color: #283043 !important;
+  box-shadow: none !important;
+  color: #e9eaf0 !important;
+}
+
+.dark .stat-item.income {
+  background: linear-gradient(135deg, #134e3b 0%, #047857 100%) !important;
+  color: #d1fae5 !important;
+  box-shadow: none !important;
+}
+
+.dark .stat-item.expense {
+  background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important;
+  color: #fee2e2 !important;
+  box-shadow: none !important;
+}
+
+.dark .stat-item.savings {
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%) !important;
+  color: #dbeafe !important;
+  box-shadow: none !important;
+}
+
+.dark .stat-item.savings-rate {
+  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%) !important;
+  color: #ede9fe !important;
+  box-shadow: none !important;
+}
+
+/* Add further overrides targeting other cards, tables, buttons, etc., as needed */
+/* Detailed Breakdown Container (dark modal) */
+.dark .detailed-breakdown {
+  background: #232a37 !important;
+  color: #e9eaf0 !important;
+  border-color: #283043 !important;
+}
+
+/* Header bar and close button */
+.dark .detailed-breakdown .breakdown-header {
+  border-bottom: 1px solid #283043 !important;
+  color: #f1f4fa !important;
+}
+
+.dark .detailed-breakdown .close-breakdown {
+  background: #283043 !important;
+  border: 1px solid #6366f1 !important; /* indigo accent */
+  color: #e9eaf0 !important;
+}
+
+.dark .detailed-breakdown .close-breakdown:hover {
+  background: #6366f1 !important;
+  color: #fff !important;
+}
+
+/* Summary panel at top */
+.dark .detailed-breakdown .detailed-summary {
+  background: #263052 !important;
+  border-color: #283043 !important;
+  box-shadow: none !important;
+}
+
+.dark .detailed-breakdown .summary-stats {
+  /* optional: remove background on grid to match new dark bg */
+  background: transparent !important;
+}
+
+/* Individual summary cards */
+.dark .detailed-breakdown .summary-item {
+  background: #232a37 !important;
+  border: 1px solid #39475b !important;
+  color: #e9eaf0 !important;
+}
+
+.dark .detailed-breakdown .summary-item.change-summary {
+  border-left: 4px solid #6366f1 !important; /* indigo highlight */
+}
+
+/* MONTHLY TABLE: */
+.dark .detailed-breakdown .detailed-monthly-table {
+  background: #232a37 !important;
+}
+
+.dark .detailed-breakdown .detailed-table-header {
+  background: #2a3350 !important;
+  color: #bfcbe8 !important;
+  border-bottom: 1px solid #283043 !important;
+}
+
+.dark .detailed-breakdown .detailed-table-row {
+  background: transparent !important;
+  color: #e9eaf0 !important;
+  border-bottom: 1px solid #283043 !important;
+}
+
+.dark .detailed-breakdown .detailed-table-row:nth-child(even) {
+  background: #2b3350 !important;
+}
+
+.dark .detailed-breakdown .detailed-table-row:hover {
+  background: #39475b !important;
+}
+
+.dark .detailed-breakdown .col-month,
+.dark .detailed-breakdown .col-current,
+.dark .detailed-breakdown .col-previous,
+.dark .detailed-breakdown .col-difference {
+  color: #e9eaf0 !important;
+}
+
+/* Optionally, add color variations for positive/negative differences */
+.dark .detailed-breakdown .col-difference.positive {
+  color: #4ade80 !important;
+}
+.dark .detailed-breakdown .col-difference.negative {
+  color: #f87171 !important;
+}
