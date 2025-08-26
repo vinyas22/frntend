@@ -694,3 +694,127 @@ html, body {
 input, input::placeholder {
   color: #222 !important;
 }
+.center {
+  background: #fff; /* solid white background */
+  border-radius: 8px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07), 0 1.5px 5px rgba(0, 0, 0, 0.06);
+  opacity: 1;
+  color: #222; /* dark text for readability */
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 95vw; /* responsive width */
+}
+
+.center h3 {
+  color: #222;
+  font-family: "Jost", sans-serif;
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 20px;
+}
+
+.center input {
+  width: 100%;
+  padding: 15px;
+  margin: 8px 0 12px 0;
+  border-radius: 4px;
+  border: 1.5px solid #87ceeb; /* skyblue border */
+  font-family: "Jost", sans-serif;
+  font-size: 1.08em;
+  outline: none;
+  color: #222; /* dark input text */
+  background-color: #fff; /* white input background */
+  transition: border-color 0.2s ease-in-out;
+}
+
+.center input::placeholder {
+  color: #999; /* gray placeholder text */
+}
+
+.center input:focus {
+  border-color: #039be5; /* deeper blue on focus */
+}
+
+.center button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  background: #87ceeb; /* skyblue button */
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 1.1em;
+  font-family: "Jost", sans-serif;
+  transition: background 0.3s ease;
+}
+
+.center button[type="submit"]:hover:not(:disabled) {
+  background: #039be5;
+}
+
+.center button[type="submit"]:disabled {
+  background: #87ceeb;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.text-red-600 {
+  color: #e53935; /* improved error color for visibility */
+  margin-top: 10px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 1em;
+  font-family: "Jost", sans-serif;
+}
+
+.auth-links {
+  margin-top: 32px;
+  text-align: center;
+  width: 100%;
+}
+
+.auth-links a {
+  color: #87ceeb;
+  font-weight: 600;
+  margin-right: 18px;
+  text-decoration: underline;
+  font-family: "Jost", sans-serif;
+}
+
+.auth-links a:last-child {
+  color: #6f6f70;
+  margin-right: 0;
+}
+.center {
+  background: #fff; /* solid white background */
+  border-radius: 8px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.07), 0 1.5px 5px rgba(0, 0, 0, 0.06);
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 1 !important;              /* fully visible immediately */
+  pointer-events: auto !important;    /* enable interaction */
+  color: #222;
+  font-family: "Jost", sans-serif;
+  width: 400px;
+  max-width: 95vw;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -200px;
+  margin-top: -200px;
+  z-index: 50;
+  transition: none !important;         /* disable any fade transitions */
+}
+
+/* Hide the savings prompt permanently since form is always visible */
+.savings-prompt-middle {
+  display: none !important;
+}
