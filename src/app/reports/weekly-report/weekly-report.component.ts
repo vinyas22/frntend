@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, PercentPipe } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
 import * as echarts from 'echarts';
 import { ReportService } from '../../services/report.service';
 import { ReportData, WeekPeriod, CategoryTotal, DailyTotal, DetailedDaily } from '../../reports/models/report.interface';
@@ -10,6 +10,7 @@ import { PeriodSelectorComponent } from '../../reports/period-selector.component
 import { SharedModule } from '../../shared/shared.module';
 import { CurrencyFormatPipe } from '../pipes/currency-format.pipe';
 import { PercentagePipe } from '../pipes/percentage.pipe';
+import { ThemeService } from '../../services/ThemeService';
 
 @Component({
   selector: 'app-weekly-report',
@@ -39,29 +40,38 @@ export class WeeklyReportComponent implements OnInit, OnDestroy, AfterViewInit {
   dailyChart: echarts.ECharts | null = null;
   @ViewChild('pieChart') pieChartRef!: ElementRef;
   @ViewChild('barChart') barChartRef!: ElementRef;
+darkMode = false;
+themeSubscription: Subscription | null = null;
 
   constructor(
     private reportService: ReportService,
     private route: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef, private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
-    this.loadAvailableWeeks();
-    this.handleRouteParams();
-  }
+  // Subscribe to theme changes
+  this.themeSubscription = this.themeService.darkMode$.subscribe(isDark => {
+    this.darkMode = isDark;
+    // Reinitialize charts with proper theme colors on theme change
+    this.initializeCharts();
+  });
+
+  this.loadAvailableWeeks();
+  this.handleRouteParams();
+}
 
   ngAfterViewInit(): void {
     if (this.reportData) this.initializeCharts();
     window.addEventListener('resize', this.onResizeCharts);
   }
-
-  ngOnDestroy(): void {
-    window.removeEventListener('resize', this.onResizeCharts);
-    this.destroy$.next();
-    this.destroy$.complete();
-    this.disposeCharts();
-  }
+ngOnDestroy(): void {
+  this.themeSubscription?.unsubscribe();
+  window.removeEventListener('resize', this.onResizeCharts);
+  this.destroy$.next();
+  this.destroy$.complete();
+  this.disposeCharts();
+}
 
   private onResizeCharts = () => {
     this.categoryChart?.resize();
@@ -233,135 +243,148 @@ if (this.reportData?.previousWeek?.detailed_daily) {
     this.initDailyChart();
   }
 
-  private initCategoryChart(): void {
-    if (!this.pieChartRef || !this.reportData) return;
-    const chartElement = this.pieChartRef.nativeElement;
-    const categories = this.filteredCategories;
-    if (this.categoryChart) this.categoryChart.dispose();
-    this.categoryChart = echarts.init(chartElement);
-    if (!categories || categories.length === 0) {
-      this.categoryChart.clear();
-      return;
-    }
-    this.categoryChart.setOption({
-      title: {
-        text: 'Expenses by Category',
-        left: 'center',
-        textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
-      },
-      tooltip: {
-        trigger: 'item',
-        formatter: '{a} {b}: ₹{c} ({d}%)'
-      },
-      series: [{
-        type: 'pie',
-        radius: ['40%', '70%'],
-        center: ['50%', '60%'],
-        data: categories.map((cat: CategoryTotal) => ({
-          value: cat.amount,
-          name: cat.category,
-          selected: this.selectedCategory === cat.category
-        })),
-        emphasis: {
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0,0,0,0.5)'
-          }
-        },
-        selectedMode: 'single',
-        selectedOffset: 10
-      }]
-    });
-    this.categoryChart.off('click');
-    this.categoryChart.on('click', (params: any) => {
-      if (params && params.name) {
-        this.onCategoryClick(params.name);
-      }
-    });
-    this.categoryChart.resize();
-  }
-private initDailyChart(): void {
-  if (!this.barChartRef || !this.reportData) {
-    console.warn('initDailyChart: Missing barChartRef or reportData');
-    return;
-  }
-  const chartElement = this.barChartRef.nativeElement;
+private initCategoryChart(): void {
+  if (!this.pieChartRef || !this.reportData) return;
+  const chartElement = this.pieChartRef.nativeElement;
+  const categories = this.filteredCategories;
+  if (this.categoryChart) this.categoryChart.dispose();
 
-  if (this.dailyChart) this.dailyChart.dispose();
-  this.dailyChart = echarts.init(chartElement);
+  this.categoryChart = echarts.init(chartElement);
 
-  console.log('initDailyChart: reportData.daily:', this.reportData.daily);
-  console.log('initDailyChart: reportData.detailed_daily:', this.reportData.detailed_daily);
-  console.log('initDailyChart: selectedCategory:', this.selectedCategory);
-
-  let dailySource = this.reportData.daily ?? [];
-
-  // If selectedCategory is set and detailed_daily exists, filter and aggregate data for that category
-  if (this.selectedCategory && this.reportData.detailed_daily) {
-    const dailyMap = new Map<string, number>();
-    this.reportData.detailed_daily
-      .filter(d => d.category === this.selectedCategory)
-      .forEach(d => {
-        dailyMap.set(d.date, (dailyMap.get(d.date) || 0) + (d.amount ?? 0));
-      });
-    dailySource = Array.from(dailyMap.entries())
-      .map(([date, total]) => ({ date, total }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    console.log('initDailyChart: filtered dailySource by selectedCategory:', dailySource);
-  } else {
-    console.log('initDailyChart: Using unfiltered dailySource:', dailySource);
-
-    // Optional fallback: aggregate all detailed_daily entries if dailySource is empty
-    if (dailySource.length === 0 && this.reportData.detailed_daily) {
-      const fallbackMap = new Map<string, number>();
-      this.reportData.detailed_daily.forEach(d => {
-        fallbackMap.set(d.date, (fallbackMap.get(d.date) || 0) + (d.amount ?? 0));
-      });
-      dailySource = Array.from(fallbackMap.entries())
-        .map(([date, total]) => ({ date, total }))
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      console.log('initDailyChart: fallback aggregated dailySource:', dailySource);
-    }
-  }
-
-  if (dailySource.length === 0) {
-    console.warn('Daily source for bar chart is empty - nothing to display.');
-    this.dailyChart.clear();
+  if (!categories || categories.length === 0) {
+    this.categoryChart.clear();
     return;
   }
 
-  this.dailyChart.setOption({
+  this.categoryChart.setOption({
+    backgroundColor: this.darkMode ? '#232a37' : '#fff',
     title: {
-      text: this.selectedCategory ? `Daily Expenses - ${this.selectedCategory}` : 'Daily Expenses',
+      text: 'Expenses by Category',
       left: 'center',
-      textStyle: { color: '#374151', fontSize: 16, fontWeight: 'bold' }
+      textStyle: { 
+        color: this.darkMode ? '#e9eaf0' : '#374151', 
+        fontSize: 16, 
+        fontWeight: 'bold' 
+      }
     },
-    tooltip: {
-      trigger: 'axis',
-      formatter: (params: any) => `${params[0].name}: ₹${params.value}`
-    },
-    xAxis: {
-      type: 'category',
-      data: dailySource.map(d =>
-        new Date(d.date).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })
-      )
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: { formatter: '₹{value}' }
-    },
+ tooltip: {
+  trigger: 'item',
+  formatter: '{a} {b}: ₹{c} ({d}%)',
+  textStyle: { color: this.darkMode ? '#e9eaf0' : '#374151' },
+  backgroundColor: this.darkMode ? '#232a37' : '#fff',
+  borderColor: this.darkMode ? '#556080' : '#eceef1',
+}
+,
+    legend: {
+  show: false
+}
+,
     series: [{
-      name: 'Daily Expense',
-      type: 'bar',
-      data: dailySource.map(d => d.total),
-      itemStyle: { color: '#3B82F6' }
+      type: 'pie',
+      radius: ['40%', '70%'],
+      center: ['50%', '60%'],
+      data: categories.map(cat => ({
+        value: cat.amount,
+        name: cat.category,
+        selected: this.selectedCategory === cat.category
+      })),
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: this.darkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)'
+        }
+      },
+      selectedMode: 'single',
+      selectedOffset: 10
     }]
   });
 
-  this.dailyChart.resize();
-  console.log('Daily chart rendered with data points:', dailySource.length);
+  this.categoryChart.off('click');
+  this.categoryChart.on('click', params => {
+    if (params && params.name) this.onCategoryClick(params.name);
+  });
+
+  this.categoryChart.resize();
 }
+
+ private initDailyChart(): void {
+    if (!this.barChartRef || !this.reportData) return;
+    const chartElement = this.barChartRef.nativeElement;
+    if (this.dailyChart) this.dailyChart.dispose();
+
+    this.dailyChart = echarts.init(chartElement);
+
+    let dailySource = this.reportData.daily ?? [];
+    if (this.selectedCategory && this.reportData.detailed_daily) {
+      const dailyMap = new Map<string, number>();
+      this.reportData.detailed_daily
+        .filter(d => d.category === this.selectedCategory)
+        .forEach(d => {
+          dailyMap.set(d.date, (dailyMap.get(d.date) || 0) + (d.amount ?? 0));
+        });
+      dailySource = Array.from(dailyMap.entries())
+        .map(([date, total]) => ({ date, total }))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    }
+
+    if (dailySource.length === 0) {
+      this.dailyChart.clear();
+      return;
+    }
+
+    this.dailyChart.setOption({
+      backgroundColor: this.darkMode ? '#232a37' : '#fff',
+      title: {
+        text: this.selectedCategory ? `Daily Expenses - ${this.selectedCategory}` : 'Daily Expenses',
+        left: 'center',
+        textStyle: { color: this.darkMode ? '#e9eaf0' : '#374151', fontSize: 16, fontWeight: 'bold' }
+      },
+    tooltip: {
+  trigger: 'axis',
+  backgroundColor: this.darkMode ? 'rgba(35,42,55,0.9)' : '#fff',
+  borderColor: this.darkMode ? '#556080' : '#eceef1',
+  borderWidth: 1,
+  formatter: (params: any): string => {
+    if (Array.isArray(params)) {
+      return `${params[0].name}: ₹${params[0].value}`;
+    }
+    return '';
+  },
+  textStyle: {
+    color: this.darkMode ? '#e9eaf0' : '#374151'
+  }
+}
+,
+
+      xAxis: {
+        type: 'category',
+        data: dailySource.map(d => 
+          new Date(d.date).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })),
+        axisLabel: { color: this.darkMode ? '#e9eaf0' : '#374151' },
+        axisLine: { lineStyle: { color: this.darkMode ? '#556080' : '#e5e7eb' } },
+        splitLine: { show: false }
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: { formatter: '₹{value}', color: this.darkMode ? '#e9eaf0' : '#374151' },
+        axisLine: { lineStyle: { color: this.darkMode ? '#556080' : '#e5e7eb' } },
+        splitLine: { lineStyle: { color: this.darkMode ? '#33415c' : '#f3f4f6' } }
+      },
+      series: [{
+        name: 'Daily Expense',
+        type: 'bar',
+        data: dailySource.map(d => d.total),
+        itemStyle: { color: '#3B82F6' }
+      }]
+    });
+
+    this.dailyChart.resize();
+  }
+
+
+
+
 
 
 

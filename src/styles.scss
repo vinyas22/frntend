@@ -235,7 +235,7 @@ html, body {
    ============================================================= */
 .dark,
 .dark * {
-  color: #fff !important;
+  color: #fff  !important;
 }
 
 /* --- Quarterly Report Container and Sections --- */
@@ -650,3 +650,40 @@ html, body {
 .stat-item.negative {
   color: #EF4444 !important;
 }
+.tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 0.74em;
+  flex-wrap: nowrap; /* prevent wrapping into multiple lines */
+  overflow-x: auto;  /* allow horizontal scroll on small screens */
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch; /* smooth scroll on mobile */
+}
+
+.tabs button {
+  flex-shrink: 0;      /* prevent buttons from shrinking */
+  background: #edf3fb;
+  color: #202229;
+  font-size: 0.98em;
+  border: none;
+  font-weight: 600;
+  padding: 0.5em 1.3em;
+  border-radius: 0.68em;
+  cursor: pointer;
+  transition: background 0.13s, color 0.12s;
+}
+
+.tabs button.active,
+.tabs button:hover {
+  background: #6366f1;
+  color: #fff;
+}
+.dark .category-section {
+  background: #232a37 !important;
+  color: #e9eaf0 !important;
+  border: 1px solid #283043 !important;
+}
+.dark .section-head h2 { color: #f1f4fa !important; }
+.dark .tabs button { background: #27314a !important; color: #e9eaf0 !important; }
+.dark .tabs button.active,
+.dark .tabs button:hover { background: #6366f1 !important; color: #fff !important; }

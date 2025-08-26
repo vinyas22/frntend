@@ -1,7 +1,7 @@
-import { Component, OnInit, ChangeDetectorRef, Inject, LOCALE_ID } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject, LOCALE_ID, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, formatDate } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Subscription } from 'rxjs';
 import { NgxEchartsModule, NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 import { EChartsOption } from 'echarts';
 import * as echarts from 'echarts/core';
@@ -23,27 +23,47 @@ export class MonthlyReportComponent implements OnInit {
   isLoading = false;
   isFilterLoading = false;
   errorMessage: string | null = null;
-
+ pieChart: echarts.ECharts | null = null;
+  barChart: echarts.ECharts | null = null;
+  comparisonChart: echarts.ECharts | null = null;
   fullReportData: ReportData | null = null;
   displayReportData: ReportData | null = null;
   selectedCategoryFilter: string | null = null;
-
+@ViewChild('pieChartContainer') pieChartEl!: ElementRef;
+@ViewChild('barChartContainer') barChartEl!: ElementRef;
+@ViewChild('comparisonChartContainer') comparisonChartEl!: ElementRef;
   pieChartOptions: EChartsOption = {};
   barChartOptions: EChartsOption = {};
   comparisonChartOptions: EChartsOption = {};
-
+themeSubscription!: Subscription;
+darkMode = false;
   constructor(
     private reportService: ReportService,
     private cdr: ChangeDetectorRef,private themeService: ThemeService,
     @Inject(LOCALE_ID) private locale: string
   ) {}
 
-  ngOnInit(): void {
-    this.loadReport();
-    this.themeService.darkMode$.subscribe(() => {
-    this.updateCharts();
+ngOnInit(): void {
+  this.themeSubscription = this.themeService.darkMode$.subscribe(isDark => {
+    this.darkMode = isDark;
+    this.updateCharts();  // Recalculate and reassign chart option objects here
   });
-  }
+
+  this.loadReport();  // initial data load
+}
+ngAfterViewInit() {
+  this.pieChart = echarts.init(this.pieChartEl.nativeElement);
+  this.barChart = echarts.init(this.barChartEl.nativeElement);
+  this.comparisonChart = echarts.init(this.comparisonChartEl.nativeElement);
+
+  this.updateCharts(); // Initial chart rendering
+}
+ngOnDestroy() {
+  this.pieChart?.dispose();
+  this.barChart?.dispose();
+  this.comparisonChart?.dispose();
+}
+
 
   async loadReport(): Promise<void> {
     this.isLoading = true;
@@ -70,13 +90,13 @@ export class MonthlyReportComponent implements OnInit {
     this.loadReport();
   }
 
-  onChartClick(event: any): void {
-    if (event.seriesType === 'pie' && event.name) {
-      this.selectedCategoryFilter =
-this.selectedCategoryFilter = null;
-      this.applyFilter();
-    }
+  onChartClick(event: any) {
+  if (event.seriesType === 'pie' && event.name) {
+    this.selectedCategoryFilter = this.selectedCategoryFilter === event.name ? null : event.name;
+    this.applyFilter();  // Apply filter to update charts and data
   }
+}
+
 
   toggleCategoryFilter(category: string): void {
     this.selectedCategoryFilter =
@@ -199,82 +219,79 @@ this.selectedCategoryFilter = null;
     return Number(current) - this.getPreviousAmount(category);
   }
 
- applyFilter(): void {
+applyFilter(): void {
   if (!this.fullReportData) return;
+
   this.isFilterLoading = true;
 
   let expense = this.fullReportData.totalExpense;
-  let dailyMap = new Map<string, number>();
+  const dailyMap = new Map<string, number>();
 
   if (this.selectedCategoryFilter) {
+    // Find the selected category's total amount
     const cat = this.fullReportData.category?.find(
       c => (c.category || 'Uncategorized') === this.selectedCategoryFilter
     );
     expense = cat?.amount || 0;
 
-    // Aggregate detailed_daily data by date for the selected category
+    // Aggregate detailed_daily data for the selected category
     this.fullReportData.detailed_daily?.forEach(d => {
       if ((d.category || 'Uncategorized') === this.selectedCategoryFilter) {
         dailyMap.set(d.date, (dailyMap.get(d.date) || 0) + d.amount);
       }
     });
   } else {
-    // If no filter selected, aggregate all categories
+    // No filter: aggregate all category detailed_daily data
     this.fullReportData.detailed_daily?.forEach(d => {
       dailyMap.set(d.date, (dailyMap.get(d.date) || 0) + d.amount);
     });
   }
 
-  // Generate sorted daily array for charts
+  // Convert dailyMap to sorted daily array (date, total)
   const dailyData = Array.from(dailyMap.entries())
     .map(([date, total]) => ({ date, total }))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
-  // Update display data for chart consumption
+  // Update displayReportData with filtered totals and daily data for charts
   this.displayReportData = {
     ...this.fullReportData,
     totalExpense: expense,
     daily: dailyData,
   };
 
+  // Update all charts with new filtered data and theme
   this.updateCharts();
+
   this.isFilterLoading = false;
-  this.cdr.markForCheck();
+  this.cdr.markForCheck();  // trigger Angular change detection if needed
 }
+
 
 
 
 private updateCharts(): void {
   if (!this.fullReportData || !this.displayReportData) return;
-const dailyDataArray = this.getDailyBreakdownData();
-console.log('getDailyBreakdownData returns:', dailyDataArray);
 
-  const currentQuarterColor = this.isDarkMode() ? '#a5b4fc' : '#4f46e5';
-  const previousQuarterColor = this.isDarkMode() ? '#cbd5e1' : '#9ca3af';
-  const barColor = this.isDarkMode() ? '#a5b4fc' : '#4f46e5';
-  const emphasisBorderColor = this.isDarkMode() ? '#232e45' : '#fff';
+  const darkMode = this.darkMode;
 
-  const piePalette = this.isDarkMode()
+  // Color palettes for dark and light modes
+  const piePalette = darkMode
     ? ['#92b4fe', '#ffe066', '#54e346', '#b983ff', '#ffb3c1', '#ffa200', '#2ec4b6', '#fd6f96', '#6a89cc', '#ffbe76']
     : ['#4f46e5', '#fde68a', '#34d399', '#a78bfa', '#fca5a5', '#fbbf24', '#06b6d4', '#f472b6', '#6366f1', '#f59e42'];
 
-  // PIE CHART
+  // Pie chart option using filtered category data
   this.pieChartOptions = {
-    backgroundColor: this.getBackgroundColor(),
+    backgroundColor: darkMode ? '#232a37' : '#fff',
     color: piePalette,
     tooltip: {
       trigger: 'item',
-      backgroundColor: this.isDarkMode() ? '#232a37' : '#fff',
-      borderColor: this.isDarkMode() ? '#39475b' : '#ccc',
-      textStyle: { color: this.isDarkMode() ? '#e9eaf0' : '#222' },
+      backgroundColor: darkMode ? '#232a37' : '#fff',
+      borderColor: darkMode ? '#39475b' : '#ccc',
+      textStyle: { color: darkMode ? '#e9eaf0' : '#222' },
       formatter: (p: any) =>
         `${p.name}: ₹${Math.round(+p.value || 0).toLocaleString('en-IN')} (${p.percent}%)`
     },
-    legend: {
-      orient: 'vertical',
-      left: 'left',
-      textStyle: { color: this.getTextColor(), fontSize: 12 }
-    },
+    
     series: [{
       type: 'pie',
       radius: ['30%', '70%'],
@@ -282,80 +299,81 @@ console.log('getDailyBreakdownData returns:', dailyDataArray);
       label: {
         show: true,
         position: 'outside',
-        color: this.getTextColor(),
+        color: darkMode ? '#e9eaf0' : '#222',
         formatter: (params: any) =>
           `${params.name}: ₹${Math.round(+params.value || 0).toLocaleString('en-IN')}`
       },
-      data: (this.fullReportData.category || []).map(c => ({
+      data: (this.displayReportData.category || []).map(c => ({
         name: c.category || 'Uncategorized',
         value: Math.round(Number(c.amount) || 0),
         selected: (c.category || 'Uncategorized') === this.selectedCategoryFilter
       })),
-      itemStyle: { borderColor: this.getBackgroundColor() }
+      itemStyle: { borderColor: darkMode ? '#232a37' : '#fff' }
     }]
   };
 
-  // BAR CHART
-const dailyData = this.displayReportData.daily || [];
+  // Bar chart option using filtered daily data
+  const dailyData = this.displayReportData.daily || [];
   this.barChartOptions = {
-    backgroundColor: this.getBackgroundColor(),
+    backgroundColor: darkMode ? '#232a37' : '#fff',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: this.isDarkMode() ? '#232a37' : '#fff',
-      borderColor: this.isDarkMode() ? '#39475b' : '#ccc',
-      textStyle: { color: this.isDarkMode() ? '#e9eaf0' : '#222' },
+      backgroundColor: darkMode ? '#232a37' : '#fff',
+      borderColor: darkMode ? '#39475b' : '#ccc',
+      textStyle: { color: darkMode ? '#e9eaf0' : '#222' },
       formatter: (params: any) =>
-        `${params[0].axisValue}: ₹${Math.round(+params.value || 0).toLocaleString('en-IN')}`
+        `${params[0]?.axisValue}: ₹${Math.round(+params[0]?.value || 0).toLocaleString('en-IN')}`
     },
     xAxis: {
       type: 'category',
       data: dailyData.map(d => formatDate(new Date(d.date), 'd MMM', this.locale)),
-      axisLabel: { rotate: 45, fontSize: 10, color: this.getTextColor() },
-      axisLine: { lineStyle: { color: this.getTextColor() } }
+      axisLabel: { rotate: 45, fontSize: 10, color: darkMode ? '#e9eaf0' : '#222' },
+      axisLine: { lineStyle: { color: darkMode ? '#39475b' : '#222' } }
     },
     yAxis: {
       type: 'value',
       axisLabel: {
         formatter: (v: number) => v >= 1000 ? `₹${Math.round(v / 1000)}K` : `₹${v}`,
-        color: this.getTextColor()
+        color: darkMode ? '#e9eaf0' : '#222'
       },
-      axisLine: { lineStyle: { color: this.getTextColor() } },
-      splitLine: { lineStyle: { color: this.isDarkMode() ? '#394867' : '#e0e7ff' } }
+      axisLine: { lineStyle: { color: darkMode ? '#39475b' : '#222' } },
+      splitLine: { lineStyle: { color: darkMode ? '#394867' : '#e0e7ff' } }
     },
-    
     series: [{
       type: 'bar',
-    data: dailyData.map(d => Math.round(d.total || 0)),
-      itemStyle: { color: barColor, borderRadius: [4, 4, 0, 0] },
+      data: dailyData.map(d => Math.round(d.total || 0)),
+      itemStyle: { color: darkMode ? '#a5b4fc' : '#4f46e5', borderRadius: [4, 4, 0, 0] },
       emphasis: {
         focus: 'series',
-        itemStyle: { borderColor: emphasisBorderColor, borderWidth: 3 }
+        itemStyle: { borderColor: darkMode ? '#232e45' : '#fff', borderWidth: 3 }
       }
     }]
-    
   };
 
-  // COMPARISON CHART
+  // Comparison chart option with filtered category data if any
   if (this.fullReportData.previousMonth) {
     let lastMonthValue = Math.round(Number(this.fullReportData.previousMonth.totalExpense) || 0);
     let thisMonthValue = Math.round(Number(this.fullReportData.totalExpense) || 0);
+
     if (this.selectedCategoryFilter) {
       const prev = this.fullReportData.previousMonth.category?.find(
         c => (c.category || 'Uncategorized') === this.selectedCategoryFilter
       );
       lastMonthValue = Math.round(Number(prev?.amount) || 0);
+
       const curr = this.fullReportData.category?.find(
         c => (c.category || 'Uncategorized') === this.selectedCategoryFilter
       );
       thisMonthValue = Math.round(Number(curr?.amount) || 0);
     }
+
     this.comparisonChartOptions = {
-      backgroundColor: this.getBackgroundColor(),
+      backgroundColor: darkMode ? '#232a37' : '#fff',
       tooltip: {
         trigger: 'axis',
-        backgroundColor: this.isDarkMode() ? '#232a37' : '#fff',
-        borderColor: this.isDarkMode() ? '#39475b' : '#ccc',
-        textStyle: { color: this.getTextColor() },
+        backgroundColor: darkMode ? '#232a37' : '#fff',
+        borderColor: darkMode ? '#39475b' : '#ccc',
+        textStyle: { color: darkMode ? '#e9eaf0' : '#222' },
         formatter: (params: any) =>
           params.map((p: any) =>
             `${p.name}: ₹${Math.round(+p.value || 0).toLocaleString('en-IN')}`
@@ -364,23 +382,23 @@ const dailyData = this.displayReportData.daily || [];
       xAxis: {
         type: 'category',
         data: ['Previous Month', 'Current Month'],
-        axisLine: { lineStyle: { color: this.getTextColor() } },
-        axisLabel: { color: this.getTextColor() }
+        axisLine: { lineStyle: { color: darkMode ? '#e9eaf0' : '#222' } },
+        axisLabel: { color: darkMode ? '#e9eaf0' : '#222' }
       },
       yAxis: {
         type: 'value',
         axisLabel: {
           formatter: (v: number) => v >= 1000 ? `₹${Math.round(v / 1000)}K` : `₹${v}`,
-          color: this.getTextColor()
+          color: darkMode ? '#e9eaf0' : '#222'
         },
-        axisLine: { lineStyle: { color: this.getTextColor() } },
-        splitLine: { lineStyle: { color: this.isDarkMode() ? '#394867' : '#e0e7ff' } }
+        axisLine: { lineStyle: { color: darkMode ? '#e9eaf0' : '#222' } },
+        splitLine: { lineStyle: { color: darkMode ? '#394867' : '#e0e7ff' } }
       },
       series: [{
         type: 'bar',
         data: [
-          { value: lastMonthValue, itemStyle: { color: '#9ca3af' } },
-          { value: thisMonthValue, itemStyle: { color: '#4f46e5' } }
+          { value: lastMonthValue, itemStyle: { color: darkMode ? '#cbd5e1' : '#9ca3af' } },
+          { value: thisMonthValue, itemStyle: { color: darkMode ? '#a5b4fc' : '#4f46e5' } }
         ],
         barWidth: '60%',
         label: {
@@ -392,6 +410,8 @@ const dailyData = this.displayReportData.daily || [];
     };
   }
 }
+
+
 
 
 

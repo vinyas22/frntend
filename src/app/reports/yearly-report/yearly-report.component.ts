@@ -227,19 +227,21 @@ private updateCharts(): void {
       formatter: (p: any) =>
         `${p.name}: ₹${Math.round(+p.value || 0).toLocaleString('en-IN')} (${p.percent}%)`,
     },
-    legend: {
-      orient: 'vertical',
-      left: 'left',
-      textStyle: { color: textColor, fontSize: 12 },
-    },
+   
     series: [
       {
         type: 'pie' as const,
         radius: ['40%', '70%'],
-        center: ['60%', '50%'],
+        center: ['50%', '50%'],
         avoidLabelOverlap: true,
-        label: { show: false, color: textColor },
-        emphasis: {
+  label: {
+    show: true,              // Always show labels
+    position: 'outside',     // Place labels outside the pie slice
+    color: this.isDarkMode ? '#e9eaf0' : '#222', // Use theme-aware color
+    fontSize: 16,            // Adjust font size if needed
+    fontWeight: 'bold',
+    formatter: (params: any) => `${params.name}` // Or full label text
+  },        emphasis: {
           label: { show: true, fontSize: 16, fontWeight: 'bold', color: textColor },
         },
         data: (this.fullReportData.category || []).map(c => ({
