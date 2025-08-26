@@ -177,6 +177,32 @@ body {
     padding: 16px 8vw;
   }
 }
+button[type="submit"] {
+  background: #87ceeb;  /* skyblue */
+  color: #fff;
+}
+.center {
+  position: absolute;
+  width: 400px;
+  max-width: 95vw;
+  height: 400px;
+  top: 50%;
+  left: 50%;
+  margin-left: -200px;
+  margin-top: -200px;
+  background: #fff;                /* Visible white card */
+  border-radius: 8px;              /* Smoothed corners */
+  box-shadow: 0 2px 14px 0 rgba(0,0,0,0.07), 0 1.5px 5px 0 rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 30px;
+  opacity: 1;
+  color: #222;
+  font-family: "Jost", sans-serif;
+}
+
 .savings-prompt-middle {
   position: absolute;
   top: 50%;
