@@ -7,8 +7,15 @@ export class ThemeService {
   darkMode$ = this.darkModeSubject.asObservable();
 
   setDarkMode(isDark: boolean): void {
-    this.darkModeSubject.next(isDark);
+  this.darkModeSubject.next(isDark);
+  const html = document.documentElement;
+  if (isDark) {
+    html.classList.add('dark');
+  } else {
+    html.classList.remove('dark');
   }
+}
+
   getDarkMode(): boolean {
     return this.darkModeSubject.value;
   }

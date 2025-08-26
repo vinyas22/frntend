@@ -19,6 +19,7 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { ThemeService } from '../../services/ThemeService';
 
 @Component({
   selector: 'app-yearly-report',
@@ -45,46 +46,59 @@ export class YearlyReportComponent implements OnInit {
   monthlyTrendOptions: EChartsOption = {};
   quarterlyChartOptions: EChartsOption = {};
   yearComparisonOptions: EChartsOption = {};
+isDarkMode: boolean = false;
 
-  isDarkMode = false;
 
   private filterTimeout: any;
 
   constructor(
     private reportService: ReportService,
-    private cdr: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef,  private themeService: ThemeService,    // Inject theme service
+
     @Inject(LOCALE_ID) private locale: string,
     private renderer: Renderer2
   ) {}
 
 
-  ngOnInit(): void {
-    this.isDarkMode = false; // default light mode
-    this.updateGlobalDarkModeClass();
-    this.loadAvailableYears().then(() => {
-      if (this.yearOptions.length > 0 && !this.selectedYear) {
-        this.selectedYear = this.yearOptions[0].value;
-      }
-      if (this.selectedYear) {
-        this.loadReport();
-      }
-    });
+
+
+  private getTextColor(): string {
+    return this.isDarkMode ? '#e0e7ff' : '#1e293b';
   }
 
-  toggleDarkMode(): void {
-    this.isDarkMode = !this.isDarkMode;
-    this.updateGlobalDarkModeClass();
-    this.updateCharts();
+  private getBackgroundColor(): string {
+    return this.isDarkMode ? '#232e45' : '#fff';
   }
 
-  private updateGlobalDarkModeClass(): void {
-    const root = document.body;
-    if (this.isDarkMode) {
-      this.renderer.addClass(root, 'dark-mode');
-    } else {
-      this.renderer.removeClass(root, 'dark-mode');
+
+
+ngOnInit(): void {
+  // Load available years first
+  this.loadAvailableYears().then(() => {
+    if (this.yearOptions.length > 0 && !this.selectedYear) {
+      this.selectedYear = this.yearOptions[0].value;
     }
-  }
+    if (this.selectedYear) {
+      this.loadReport();
+    }
+  });
+
+  // Initialize local dark mode state from theme service
+  this.isDarkMode = this.themeService.getDarkMode();
+
+  // Subscribe to theme changes to update charts dynamically
+  this.themeService.darkMode$.subscribe(() => {
+    this.isDarkMode = this.themeService.getDarkMode();
+    this.updateCharts();
+    this.cdr.markForCheck();
+  });
+}
+
+
+
+
+
+
 
   async loadAvailableYears(): Promise<void> {
     this.isLoadingYears = true;
@@ -122,24 +136,28 @@ export class YearlyReportComponent implements OnInit {
     return years;
   }
 
-  async loadReport(): Promise<void> {
-    if (!this.selectedYear) return;
-    this.isLoading = true;
-    this.errorMessage = null;
-    this.selectedCategoryFilter = null;
-    try {
-      const report = await this.reportService.getYearlyReport(this.selectedYear).toPromise();
-      this.fullReportData = report ?? null;
-      this.applyFilter();
-    } catch (error: any) {
-      this.errorMessage = error.error?.message || 'Failed to load yearly report.';
-      this.fullReportData = null;
-      this.displayReportData = null;
-    } finally {
-      this.isLoading = false;
-      this.cdr.markForCheck();
-    }
+ async loadReport(): Promise<void> {
+  if (!this.selectedYear) return;
+  this.isLoading = true;
+  this.errorMessage = null;
+  this.selectedCategoryFilter = null;
+
+  try {
+    const report = await this.reportService.getYearlyReport(this.selectedYear).toPromise();
+    this.fullReportData = report ?? null;
+    
+    // Apply filter and update charts immediately
+    this.applyFilter();
+    this.updateCharts(); // <- ensures dark/light mode applies
+  } catch (error: any) {
+    this.errorMessage = error.error?.message || 'Failed to load yearly report.';
+    this.fullReportData = null;
+    this.displayReportData = null;
+  } finally {
+    this.isLoading = false;
+    this.cdr.markForCheck();
   }
+}
 
   onYearChange(): void {
     if (this.selectedYear) {
@@ -192,286 +210,145 @@ export class YearlyReportComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  private updateCharts(): void {
-    if (!this.fullReportData || !this.displayReportData) return;
-    const bgColor = this.isDarkMode ? '#121212' : '#ffffff';
-    const textColor = this.isDarkMode ? '#e0e0e0' : '#1e293b';
+private updateCharts(): void {
+  if (!this.fullReportData || !this.displayReportData) return;
 
-    this.pieChartOptions = {
-      backgroundColor: bgColor,
-      animation: true,
-      animationDuration: 400,
-      animationEasing: 'cubicOut',
-      animationDurationUpdate: 400,
-      animationEasingUpdate: 'cubicOut',
-      tooltip: {
-        trigger: 'item',
-        backgroundColor: this.isDarkMode ? '#333' : undefined,
-        textStyle: { color: textColor },
-        formatter: (p: any) =>
-          `${p.name}: ₹${(+p.value || 0).toLocaleString('en-IN')} (${p.percent}%)`,
-      },
-      legend: {
-        orient: 'vertical',
-        left: 'left',
-        textStyle: { fontSize: 12, color: textColor },
-      },
-      series: [
-        {
-          type: 'pie' as const,
-          radius: ['40%', '70%'],
-          center: ['60%', '50%'],
-          avoidLabelOverlap: true,
-          label: { show: false, color: textColor },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: 16,
-              fontWeight: 'bold',
-              color: textColor,
-            },
-          },
-          data: (this.fullReportData.category || []).map((c) => ({
-            name: c.category || 'Uncategorized',
-            value: Math.max(0, c.amount || 0),
-            selected: (c.category || 'Uncategorized') === this.selectedCategoryFilter,
-          })),
-        } as SeriesOption,
-      ],
-    };
+  const bgColor = this.isDarkMode ? '#232e45' : '#fff';
+  const textColor = this.isDarkMode? '#e0e7ff' : '#1e293b';
 
-    const monthlyData = this.getMonthlyBreakdownData();
-    this.monthlyTrendOptions = {
-      backgroundColor: bgColor,
-      animation: true,
-      animationDuration: 400,
-      animationEasing: 'cubicOut',
-      animationDurationUpdate: 400,
-      animationEasingUpdate: 'cubicOut',
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: this.isDarkMode ? '#333' : undefined,
-        textStyle: { color: textColor },
-        formatter: (params: any) => {
-          const arr = Array.isArray(params) ? params : [params];
-          return arr
-            .map(
-              (p) =>
-                `${p.name}: ₹${(+p.value || 0).toLocaleString('en-IN')}`
-            )
-            .join('<br>');
+  // PIE CHART
+  this.pieChartOptions = {
+    backgroundColor: bgColor,
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: this.isDarkMode ? '#232a37' : '#fff',
+      borderColor: this.isDarkMode ? '#39475b' : '#ccc',
+      textStyle: { color: textColor },
+      formatter: (p: any) =>
+        `${p.name}: ₹${Math.round(+p.value || 0).toLocaleString('en-IN')} (${p.percent}%)`,
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+      textStyle: { color: textColor, fontSize: 12 },
+    },
+    series: [
+      {
+        type: 'pie' as const,
+        radius: ['40%', '70%'],
+        center: ['60%', '50%'],
+        avoidLabelOverlap: true,
+        label: { show: false, color: textColor },
+        emphasis: {
+          label: { show: true, fontSize: 16, fontWeight: 'bold', color: textColor },
         },
+        data: (this.fullReportData.category || []).map(c => ({
+          name: c.category || 'Uncategorized',
+          value: Math.max(0, c.amount || 0),
+          selected: (c.category || 'Uncategorized') === this.selectedCategoryFilter,
+        })),
       },
-      legend: {
-        data: ['Current Year', 'Previous Year'],
-        textStyle: { color: textColor },
-      },
-      grid: {
-        top: '15%',
-        left: '10%',
-        right: '10%',
-        bottom: '15%',
-        containLabel: true,
-      },
-      xAxis: {
-        type: 'category',
-        data: monthlyData.map((m) => m.monthName),
-        axisLine: { lineStyle: { color: textColor } },
-        axisLabel: { color: textColor },
-      },
-      yAxis: {
-        type: 'value',
-        axisLabel: {
-          color: textColor,
-          formatter: (value: number) =>
-            value >= 1000 ? `₹${(value / 1000).toFixed(0)}K` : `₹${value}`,
-        },
-        axisLine: { lineStyle: { color: textColor } },
-        splitLine: {
-          lineStyle: {
-            color: this.isDarkMode ? '#444' : '#eee',
-          },
-        },
-      },
-      series: [
-        {
-          name: 'Current Year',
-          type: 'line' as const,
-          data: monthlyData.map((m) => m.currentAmount),
-          itemStyle: { color: '#4f46e5' },
-          smooth: true,
-        },
-        ...(this.fullReportData.previousYear
-          ? [
-              {
-                name: 'Previous Year',
-                type: 'line' as const,
-                data: monthlyData.map((m) => m.previousAmount),
-                itemStyle: { color: '#9ca3af' },
-                smooth: true,
-              },
-            ]
-          : []),
-      ],
-    };
+    ],
+  };
 
-    let quarterlyData = this.fullReportData.quarterly || [];
-    if (this.selectedCategoryFilter) {
-      const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
-      quarterlyData = quarters
-        .map((quarterName) => {
-          const quarterlyTotal = this.getQuarterlyAmountForCategory(
-            quarterName,
-            this.selectedCategoryFilter!
-          );
-          return {
-            quarter: quarterName,
-            total: quarterlyTotal,
-          };
-        })
-        .filter((q) => q.total > 0);
-    }
-    this.quarterlyChartOptions = {
-      backgroundColor: bgColor,
-      animation: true,
-      animationDuration: 400,
-      animationEasing: 'cubicOut',
-      animationDurationUpdate: 400,
-      animationEasingUpdate: 'cubicOut',
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: this.isDarkMode ? '#333' : undefined,
-        textStyle: { color: textColor },
-        formatter: (params: any) => {
-          const p = Array.isArray(params) ? params[0] : params;
-          return `${p.name}: ₹${(+p.value || 0).toLocaleString('en-IN')}`;
-        },
+  // MONTHLY TREND
+  const monthlyData = this.getMonthlyBreakdownData();
+  this.monthlyTrendOptions = {
+    backgroundColor: bgColor,
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: this.isDarkMode ? '#232a37' : '#fff',
+      textStyle: { color: textColor },
+      formatter: (params: any) => {
+        const arr = Array.isArray(params) ? params : [params];
+        return arr
+          .map(p => `${p.name}: ₹${Math.round(+p.value || 0).toLocaleString('en-IN')}`)
+          .join('<br>');
       },
-      grid: {
-        top: '10%',
-        left: '10%',
-        right: '10%',
-        bottom: '15%',
-        containLabel: true,
+    },
+    legend: { data: ['Current Year', 'Previous Year'], textStyle: { color: textColor } },
+    xAxis: { type: 'category', data: monthlyData.map(m => m.monthName), axisLine: { lineStyle: { color: textColor } }, axisLabel: { color: textColor } },
+    yAxis: {
+      type: 'value',
+      axisLabel: { color: textColor, formatter: (v: number) => (v >= 1000 ? `₹${Math.round(v/1000)}K` : `₹${v}`) },
+      axisLine: { lineStyle: { color: textColor } },
+      splitLine: { lineStyle: { color: this.isDarkMode ? '#394867' : '#e0e7ff' } },
+    },
+    series: [
+      {
+        name: 'Current Year',
+        type: 'line' as const,
+        smooth: true,
+        data: monthlyData.map(m => m.currentAmount),
+        itemStyle: { color: '#4f46e5' },
       },
-      xAxis: {
-        type: 'category',
-        data: quarterlyData.map((q) => q.quarter),
-        axisLine: { lineStyle: { color: textColor } },
-        axisLabel: { color: textColor },
-      },
-      yAxis: {
-        type: 'value',
-        axisLabel: {
-          color: textColor,
-          formatter: (value: number) =>
-            value >= 1000 ? `₹${(value / 1000).toFixed(0)}K` : `₹${value}`,
-        },
-        axisLine: { lineStyle: { color: textColor } },
-        splitLine: {
-          lineStyle: {
-            color: this.isDarkMode ? '#444' : '#eee',
-          },
-        },
-      },
-      series: [
-        {
-          type: 'bar' as const,
-          data: quarterlyData.map((q) => q.total),
-          itemStyle: {
-            color: '#4f46e5',
-            borderRadius: [4, 4, 0, 0],
-          },
-        },
-      ],
-    };
+      ...(this.fullReportData.previousYear ? [{
+        name: 'Previous Year',
+        type: 'line' as const,
+        smooth: true,
+        data: monthlyData.map(m => m.previousAmount),
+        itemStyle: { color: '#9ca3af' },
+      }] : []),
+    ],
+  };
 
-    if (this.fullReportData.previousYear) {
-      const currentCategories = this.fullReportData.category || [];
-      const previousCategories = this.fullReportData.previousYear.category || [];
-      let topCategories: any[];
-      if (this.selectedCategoryFilter) {
-        const currentCat = currentCategories.find(
-          (c) => (c.category || 'Uncategorized') === this.selectedCategoryFilter
-        );
-        topCategories = currentCat ? [currentCat] : [];
-      } else {
-        topCategories = currentCategories.slice(0, 5);
-      }
-      this.yearComparisonOptions = {
-        backgroundColor: bgColor,
-        animation: true,
-        animationDuration: 400,
-        animationEasing: 'cubicOut',
-        animationDurationUpdate: 400,
-        animationEasingUpdate: 'cubicOut',
-        tooltip: {
-          trigger: 'axis',
-          backgroundColor: this.isDarkMode ? '#333' : undefined,
-          textStyle: { color: textColor },
-          formatter: (params: any) => {
-            const arr = Array.isArray(params) ? params : [params];
-            return arr
-              .map(
-                (p) =>
-                  `${p.seriesName}: ₹${(+p.value || 0).toLocaleString('en-IN')}`
-              )
-              .join('<br>');
-          },
-        },
-        legend: {
-          data: ['Current Year', 'Previous Year'],
-          textStyle: { color: textColor },
-        },
-        grid: {
-          top: '15%',
-          left: '10%',
-          right: '10%',
-          bottom: '25%',
-          containLabel: true,
-        },
-        xAxis: {
-          type: 'category',
-          data: topCategories.map((c) => c.category || 'Uncategorized'),
-          axisLabel: { rotate: 45, color: textColor },
-          axisLine: { lineStyle: { color: textColor } },
-        },
-        yAxis: {
-          type: 'value',
-          axisLabel: {
-            color: textColor,
-            formatter: (value: number) =>
-              value >= 1000 ? `₹${(value / 1000).toFixed(0)}K` : `₹${value}`,
-          },
-          axisLine: { lineStyle: { color: textColor } },
-          splitLine: {
-            lineStyle: {
-              color: this.isDarkMode ? '#444' : '#eee',
-            },
-          },
-        },
-        series: [
-          {
-            name: 'Current Year',
-            type: 'bar' as const,
-            data: topCategories.map((c) => c.amount),
-            itemStyle: { color: '#4f46e5' },
-          },
-          {
-            name: 'Previous Year',
-            type: 'bar' as const,
-            data: topCategories.map((c) => {
-              const prevCat = previousCategories.find(
-                (pc) => (pc.category || 'Uncategorized') === (c.category || 'Uncategorized')
-              );
-              return prevCat?.amount || 0;
-            }),
-            itemStyle: { color: '#9ca3af' },
-          },
-        ] as SeriesOption[],
-      };
-    }
+  // QUARTERLY CHART
+  let quarterlyData = this.fullReportData.quarterly || [];
+  if (this.selectedCategoryFilter) {
+    quarterlyData = ['Q1','Q2','Q3','Q4'].map(q => ({
+      quarter: q,
+      total: this.getQuarterlyAmountForCategory(q, this.selectedCategoryFilter!)
+    })).filter(q => q.total > 0);
   }
+
+  this.quarterlyChartOptions = {
+    backgroundColor: bgColor,
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: this.isDarkMode ? '#232a37' : '#fff',
+      textStyle: { color: textColor },
+      formatter: (params: any) => {
+        const p = Array.isArray(params) ? params[0] : params;
+        return `${p.name}: ₹${Math.round(+p.value || 0).toLocaleString('en-IN')}`;
+      }
+    },
+    xAxis: { type: 'category', data: quarterlyData.map(q => q.quarter), axisLine: { lineStyle: { color: textColor } }, axisLabel: { color: textColor } },
+    yAxis: { type: 'value', axisLine: { lineStyle: { color: textColor } }, axisLabel: { color: textColor }, splitLine: { lineStyle: { color: this.isDarkMode ? '#394867' : '#e0e7ff' } } },
+    series: [{
+      type: 'bar',
+      data: quarterlyData.map(q => q.total),
+      itemStyle: { color: '#4f46e5', borderRadius: [4,4,0,0] }
+    }]
+  };
+
+  // YEAR COMPARISON CHART
+  if (this.fullReportData.previousYear) {
+    const currentCats = this.fullReportData.category || [];
+    const previousCats = this.fullReportData.previousYear.category || [];
+    let topCats = this.selectedCategoryFilter
+      ? currentCats.filter(c => (c.category || 'Uncategorized') === this.selectedCategoryFilter)
+      : currentCats.slice(0, 5);
+
+    this.yearComparisonOptions = {
+      backgroundColor: bgColor,
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: this.isDarkMode ? '#232a37' : '#fff',
+        textStyle: { color: textColor },
+        formatter: (params: any) => (Array.isArray(params) ? params : [params])
+          .map(p => `${p.seriesName}: ₹${Math.round(+p.value || 0).toLocaleString('en-IN')}`)
+          .join('<br>')
+      },
+      xAxis: { type: 'category', data: topCats.map(c => c.category || 'Uncategorized'), axisLine: { lineStyle: { color: textColor } }, axisLabel: { color: textColor, rotate: 45 } },
+      yAxis: { type: 'value', axisLine: { lineStyle: { color: textColor } }, axisLabel: { color: textColor, formatter: v => v >= 1000 ? `₹${Math.round(v/1000)}K` : `₹${v}` }, splitLine: { lineStyle: { color: this.isDarkMode ? '#394867' : '#e0e7ff' } } },
+      series: [
+        { name: 'Current Year', type: 'bar', data: topCats.map(c => c.amount), itemStyle: { color: '#4f46e5' } },
+        { name: 'Previous Year', type: 'bar', data: topCats.map(c => previousCats.find(pc => (pc.category || 'Uncategorized') === (c.category || 'Uncategorized'))?.amount || 0), itemStyle: { color: '#9ca3af' } }
+      ]
+    };
+  }
+}
+
 
   getPreviousYearExpense(): number {
     return this.fullReportData?.previousYear?.totalExpense || 0;

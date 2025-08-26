@@ -28,13 +28,7 @@ export class HeaderComponent {
 
 toggleDarkMode() {
   this.darkMode = !this.darkMode;
-  if (this.darkMode) {
-    document.documentElement.classList.add('dark'); // puts .dark on <html>
-    console.log('Dark mode ON: .dark added to <html>');
-  } else {
-    document.documentElement.classList.remove('dark');
-    console.log('Dark mode OFF: .dark removed from <html>');
-  }
+
     this.themeService.setDarkMode(this.darkMode);
 
 }

@@ -160,7 +160,7 @@ html, body {
 }
 .dark .mobile-hamburger {
   background: #232a37 !important;
-  color: #fff !important;
+  color: #232a37 !important;
 }
 .dark .sidebar-link.active,
 .dark .sidebar-link:hover {
@@ -631,4 +631,22 @@ html, body {
 .dark .yearly-report-container {
   background-color: #232f45 !important;
   color: #e0e7ff !important;
+}
+.stat-item {
+  border-radius: 1rem;
+  padding: 1.5rem 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  color: white;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.stat-item.income { background-color: #10B981; }
+.stat-item.expense { background-color: #EF4444; }
+.stat-item.savings { background-color: #3B82F6; }
+.stat-item.savings-rate { background-color: #A855F7; }
+
+.stat-item.negative {
+  color: #EF4444 !important;
 }

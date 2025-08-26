@@ -792,17 +792,13 @@ font-family: 'Jost', sans-serif !important;
     }
 
     .year-overview .overview-card {
-      padding: 24px;
-
-      .overview-stats {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 16px;
-
-        .stat-item {
-          padding: 16px;
-        }
-      }
-    }
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
     .charts-section {
       grid-template-columns: 1fr;
