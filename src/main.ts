@@ -4,7 +4,8 @@ import { AppComponent } from './app/app.component';
 import { AuthService } from './app/services/auth.service';
 import { routes } from './app/app.routes';
 import { provideRouter } from '@angular/router';
-import { inject } from '@angular/core';
+import { inject, isDevMode } from '@angular/core';
+import { provideServiceWorker } from '@angular/service-worker';
 
 // Direct interceptor function
 function authInterceptorFn(req: any, next: any) {
@@ -25,6 +26,9 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(withInterceptors([authInterceptorFn])),
     provideRouter(routes),
-    // ... other providers
-  ]
+    provideServiceWorker('ngsw-worker.js', {
+        enabled: !isDevMode(),
+        registrationStrategy: 'registerWhenStable:30000'
+    })
+]
 });

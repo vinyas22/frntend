@@ -1,0 +1,79 @@
+{
+  "configVersion": 1,
+  "timestamp": 1756311672901,
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/455.c2b5d2979c91d5d3.js",
+        "/index.html",
+        "/main.bd07200d2ef0ab78.js",
+        "/manifest.webmanifest",
+        "/polyfills.e2d50ff180717bf3.js",
+        "/runtime.c970a412ff9ce2eb.js",
+        "/styles.59f0e702bcc40b21.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/assets/android-launchericon-144-144.png",
+        "/assets/android-launchericon-192-192.png",
+        "/assets/android-launchericon-48-48.png",
+        "/assets/android-launchericon-512-512.png",
+        "/assets/android-launchericon-72-72.png",
+        "/assets/android-launchericon-96-96.png",
+        "/assets/logo.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/455.c2b5d2979c91d5d3.js": "c2755c56bfd56d0c615e26c1c16f30de7e2e2077",
+    "/assets/android-launchericon-144-144.png": "097733c453d9b057ee0f774c0e016ade3a8a5d33",
+    "/assets/android-launchericon-192-192.png": "8caddf4e0d7a2ccfa7415433ad4ed389c34971d9",
+    "/assets/android-launchericon-48-48.png": "5a4e680ed3652d0c849bb5095c86062ec5d2532a",
+    "/assets/android-launchericon-512-512.png": "ed095890c0145e83f51c74fd470282249771cb5a",
+    "/assets/android-launchericon-72-72.png": "b3883676ca507e3d870892ac83b3625737e6c792",
+    "/assets/android-launchericon-96-96.png": "496b5ff83ad0381b241028f6f72eb3f2037d0147",
+    "/assets/logo.png": "59bc6591b907028cabffcbb575a896814c51dfc4",
+    "/index.html": "bb0b61fd35a6c9edf0766ad8f8dfb1b4d713c0e6",
+    "/main.bd07200d2ef0ab78.js": "c2d6f919b2183317585ccb216f1869ff2c7d0aff",
+    "/manifest.webmanifest": "0c914ba1141c4f0b17647c93fb8c7c4d93e6a510",
+    "/polyfills.e2d50ff180717bf3.js": "8194291037566dc7fb6f86912740f67160ad51ab",
+    "/runtime.c970a412ff9ce2eb.js": "25d47398a536e7909749f1bdc6d712baa62331a1",
+    "/styles.59f0e702bcc40b21.css": "6feaae9ebedb41fef22228a29f9b5ddb3f913855"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
