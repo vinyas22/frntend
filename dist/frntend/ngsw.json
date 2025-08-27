@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1756311672901,
+  "timestamp": 1756312827767,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -50,9 +50,9 @@
     "/assets/android-launchericon-72-72.png": "b3883676ca507e3d870892ac83b3625737e6c792",
     "/assets/android-launchericon-96-96.png": "496b5ff83ad0381b241028f6f72eb3f2037d0147",
     "/assets/logo.png": "59bc6591b907028cabffcbb575a896814c51dfc4",
-    "/index.html": "bb0b61fd35a6c9edf0766ad8f8dfb1b4d713c0e6",
+    "/index.html": "cefd07aa139c6462b75e7557b6398b1199625255",
     "/main.bd07200d2ef0ab78.js": "c2d6f919b2183317585ccb216f1869ff2c7d0aff",
-    "/manifest.webmanifest": "0c914ba1141c4f0b17647c93fb8c7c4d93e6a510",
+    "/manifest.webmanifest": "eb43595ad8b7dbd55bee8ca4b3a13eb8ff583dc0",
     "/polyfills.e2d50ff180717bf3.js": "8194291037566dc7fb6f86912740f67160ad51ab",
     "/runtime.c970a412ff9ce2eb.js": "25d47398a536e7909749f1bdc6d712baa62331a1",
     "/styles.59f0e702bcc40b21.css": "6feaae9ebedb41fef22228a29f9b5ddb3f913855"
