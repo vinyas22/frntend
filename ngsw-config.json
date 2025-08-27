@@ -7,7 +7,7 @@
       "installMode": "prefetch",
       "resources": {
         "files": [
-  "assets/android-launcher-icon-48-48.png",
+  "assets/android-launchericon-48-48.png",
           "/index.html",
           "/manifest.webmanifest",
           "/*.css",

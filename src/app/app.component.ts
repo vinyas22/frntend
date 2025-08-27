@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, inject } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { LayoutService } from './layout/layout.service';
 import { Notification, NotificationService } from './services/notification.service';
@@ -33,6 +33,19 @@ export class AppComponent implements OnInit, OnDestroy {
   notificationService = inject(NotificationService);
   router = inject(Router);
 
+  // PWA Install Prompt event saved here
+  deferredPrompt: any = null;
+  // Controls visibility of install button
+  showInstallButton = false;
+
+  // Listen to the beforeinstallprompt event on window and save it
+  @HostListener('window:beforeinstallprompt', ['$event'])
+  onBeforeInstallPrompt(event: Event) {
+    event.preventDefault();  // Prevent default prompt
+    this.deferredPrompt = event;
+    this.showInstallButton = true;  // Show install button in UI
+  }
+
   ngOnInit() {
     // Toast notification subscription
     this.toastSub = this.notificationService.toast$.subscribe(toast => {
@@ -55,6 +68,21 @@ export class AppComponent implements OnInit, OnDestroy {
     // Sidebar collapse state
     this.layoutService.sidebarCollapsed$.subscribe(val => {
       this.isSidebarCollapsed = val;
+    });
+  }
+
+  // Call this method from your UI button to prompt installation
+  installPWA() {
+    if (!this.deferredPrompt) return;
+    this.deferredPrompt.prompt();
+    this.deferredPrompt.userChoice.then((choiceResult: any) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the PWA install prompt');
+      } else {
+        console.log('User dismissed the PWA install prompt');
+      }
+      this.deferredPrompt = null;
+      this.showInstallButton = false;
     });
   }
 

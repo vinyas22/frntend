@@ -1,13 +1,23 @@
 <ng-container *ngIf="!isLoginLayout; else authLayout">
   <div class="dashboard-layout">
     <app-sidebar></app-sidebar>
-    <div class="main-panel" >
+    <div class="main-panel">
       <app-header></app-header>
       <app-notification-toast
         *ngIf="latestToast"
         [notification]="latestToast"
         (closed)="latestToast = null"
-        (clicked)="latestToast = null"></app-notification-toast>
+        (clicked)="latestToast = null">
+      </app-notification-toast>
+
+      <!-- PWA Install Button -->
+      <button 
+        *ngIf="showInstallButton" 
+        (click)="installPWA()" 
+        class="install-pwa-btn">
+        Install App
+      </button>
+
       <main class="dashboard-content">
         <router-outlet></router-outlet>
       </main>
@@ -20,6 +30,7 @@
     *ngIf="latestToast"
     [notification]="latestToast"
     (closed)="latestToast = null"
-    (clicked)="latestToast = null"></app-notification-toast>
+    (clicked)="latestToast = null">
+  </app-notification-toast>
   <router-outlet></router-outlet>
 </ng-template>
