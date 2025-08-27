@@ -27,6 +27,10 @@ export class EntriesAddComponent implements OnInit {
   submitting = false;
   error = '';
 
+  // Dropdown UI state for custom dropdown
+  dropdownOpen = false;
+  selectedBill: any = null;
+
   constructor(
     private fb: FormBuilder,
     private billsService: BillsService,
@@ -37,6 +41,17 @@ export class EntriesAddComponent implements OnInit {
     // Load bills
     this.billsService.getBills().subscribe(bills => {
       this.bills = bills;
+
+      // If form has a billId initially set, sync selectedBill for UI display
+      const currentBillId = this.entryForm.get('billId')?.value;
+      if (currentBillId) {
+        this.selectedBill = this.bills.find(b => b.id === currentBillId) || null;
+      }
+    });
+
+    // Sync selectedBill whenever billId form control value changes
+    this.entryForm.get('billId')?.valueChanges.subscribe(billId => {
+      this.selectedBill = this.bills.find(b => b.id === billId) || null;
     });
 
     // Load categories
@@ -73,6 +88,18 @@ export class EntriesAddComponent implements OnInit {
 
   removeItem(i: number) {
     if (this.items.length > 1) this.items.removeAt(i);
+  }
+
+  // Toggle custom dropdown open/close state
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  // Handler to select a bill from the dropdown
+  selectBill(bill: any) {
+    this.selectedBill = bill;
+    this.entryForm.get('billId')?.setValue(bill.id);
+    this.dropdownOpen = false;
   }
 
   submit() {

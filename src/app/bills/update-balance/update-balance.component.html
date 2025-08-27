@@ -3,17 +3,47 @@
   <form [formGroup]="form" (ngSubmit)="submit()">
 
     <!-- Bill Select -->
-    <div class="mb-4">
-      <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">Bill</label>
-      <select
-        formControlName="billId"
-        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:outline-none"
-        required
+<div class="mb-4">
+  <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">Bill</label>
+  
+  <div class="relative w-full max-w-xl">
+    <button
+      type="button"
+      (click)="toggleDropdown()"
+      class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-left text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-green-500 focus:outline-none flex justify-between items-center"
+      [attr.aria-expanded]="dropdownOpen"
+      aria-haspopup="listbox"
+    >
+      <span [class.text-gray-400]="!selectedBill" [class.dark:text-gray-200]="!selectedBill">
+        {{ selectedBill ? (selectedBill.title + ' (' + selectedBill.bill_month + ')') : 'Select bill...' }}
+      </span>
+      <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+      </svg>
+    </button>
+
+    <ul
+      *ngIf="dropdownOpen"
+      role="listbox"
+      tabindex="-1"
+      class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded shadow max-h-60 overflow-auto"
+    >
+      <li
+        *ngFor="let bill of bills"
+        role="option"
+        tabindex="0"
+        (click)="selectBill(bill)"
+        (keydown.enter)="selectBill(bill)"
+        class="px-4 py-2 cursor-pointer hover:bg-green-500 hover:text-white"
+        [attr.aria-selected]="selectedBill?.id === bill.id ? 'true' : 'false'"
       >
-        <option value="">Select bill...</option>
-        <option *ngFor="let bill of bills" [value]="bill.id">{{ bill.title }} ({{ bill.bill_month }})</option>
-      </select>
-    </div>
+        {{ bill.title }} ({{ bill.bill_month }})
+      </li>
+    </ul>
+  </div>
+</div>
+
+
 
     <!-- Total Balance Input -->
     <div class="mb-4">

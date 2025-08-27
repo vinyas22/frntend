@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { BillsService } from '../../services/bills.service';
 import { Router } from '@angular/router';
@@ -21,6 +21,9 @@ export class UpdateBalanceComponent implements OnInit {
   error = '';
   submitting = false;
 
+  dropdownOpen = false;
+  selectedBill: any = null;
+
   constructor(
     private fb: FormBuilder,
     private billsService: BillsService,
@@ -28,7 +31,33 @@ export class UpdateBalanceComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.billsService.getBills().subscribe(bills => this.bills = bills);
+    this.billsService.getBills().subscribe(bills => {
+      this.bills = bills;
+      const currentBillId = this.form.get('billId')?.value;
+      this.selectedBill = this.bills.find(b => b.id === currentBillId) || null;
+    });
+
+    this.form.get('billId')?.valueChanges.subscribe(billId => {
+      this.selectedBill = this.bills.find(b => b.id === billId) || null;
+    });
+  }
+
+  toggleDropdown() {
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+
+  selectBill(bill: any) {
+    this.selectedBill = bill;
+    this.form.get('billId')?.setValue(bill.id);
+    this.dropdownOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.relative')) {
+      this.dropdownOpen = false;
+    }
   }
 
   submit() {

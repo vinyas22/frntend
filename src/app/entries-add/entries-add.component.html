@@ -3,21 +3,40 @@
   <form [formGroup]="entryForm" (ngSubmit)="submit()">
     <!-- Bill Select -->
     <div class="mb-4">
-      <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">Bill</label>
-      <select formControlName="billId"
-        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        required>
-        <option value="">Select...</option>
-        <option *ngFor="let bill of bills" [value]="bill.id">{{ bill.title }} ({{ bill.bill_month }})</option>
-      </select>
+  <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">Bill</label>
+<div class="relative w-full max-w-xl">
+  <button
+    type="button"
+    (click)="toggleDropdown()"
+    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-left text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none flex justify-between items-center"
+  >
+    <span [class.text-gray-400]="!selectedBill" [class.dark:text-gray-200]="!selectedBill">
+      {{ selectedBill ? (selectedBill.title + ' (' + selectedBill.bill_month + ')') : 'Select bill...' }}
+    </span>
+    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+    </svg>
+  </button>
+
+  <ul *ngIf="dropdownOpen"
+      class="absolute z-10 mt-1 w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded shadow max-h-60 overflow-auto">
+    <li *ngFor="let bill of bills"
+        (click)="selectBill(bill)"
+        class="px-4 py-2 hover:bg-blue-500 hover:text-white cursor-pointer">
+      {{ bill.title }} ({{ bill.bill_month }})
+    </li>
+  </ul>
+</div>
     </div>
+
 
     <!-- Entry Date Input -->
     <div class="mb-4">
       <label class="block mb-1 text-sm font-semibold text-gray-700 dark:text-gray-200">Entry Date</label>
       <input type="date"
-        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        formControlName="entry_date" required />
+        class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        formControlName="entry_date" required
+        placeholder="dd/mm/yyyy" />
     </div>
 
     <!-- Entry Items Array -->
@@ -29,39 +48,43 @@
           <!-- Category -->
           <div class="flex flex-col">
             <select
-              class="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              class="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               formControlName="category"
               required
               [disabled]="categoriesLoading"
             >
-              <option value="">Select category</option>
+              <option value="" disabled selected hidden>Select category</option>
               <option *ngFor="let c of availableCategories" [value]="c">{{ c }}</option>
               <option value="__custom__">(Custom category...)</option>
             </select>
             <!-- Custom category input -->
             <input
               *ngIf="item.get('category')?.value === '__custom__'"
-              class="mt-2 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              class="mt-2 p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
               formControlName="customCategory"
               placeholder="Enter custom category"
               required
             />
           </div>
+
           <input
-            class="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            formControlName="description"
-            placeholder="Description"
-            required
-          />
+  class="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+  formControlName="description"
+  placeholder="Description"
+  required
+/>
+
+
           <input
             type="number" min="1"
-            class="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            class="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
             formControlName="amount"
             placeholder="Amount"
             required
           />
+
           <input
-            class="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            class="p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
             formControlName="proof_url"
             placeholder="Proof URL (optional)"
           />
@@ -79,7 +102,6 @@
         Add Another Entry
       </button>
     </div>
-
     <div *ngIf="error" class="text-red-600 dark:text-red-400 my-2 text-sm">{{ error }}</div>
     <button type="submit"
       class="mt-4 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white px-4 py-2 rounded shadow transition font-semibold flex items-center gap-2"
