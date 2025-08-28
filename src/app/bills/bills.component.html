@@ -1,7 +1,5 @@
-<!-- src/app/components/bills/bills.component.html -->
 <div class="p-4">
   <h2 class="text-2xl font-semibold flex items-center mb-4">
-    <!-- ✅ Replaced HeroDocumentText ng-icon with inline SVG -->
     <svg class="w-6 h-6 mr-2 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
       <polyline points="14,2 14,8 20,8"/>
@@ -12,33 +10,43 @@
   </h2>
   <div *ngIf="loading" class="text-gray-600">Loading...</div>
   <div *ngIf="!loading && bills.length === 0" class="text-gray-400">No bills found.</div>
-  <table *ngIf="!loading && bills.length" class="min-w-full divide-y divide-gray-200 bg-white dark:bg-gray-800 rounded-lg shadow">
-    <thead>
-      <tr>
-        <th class="px-4 py-2 text-left">Title</th>
-        <th class="px-4 py-2 text-left">Month</th>
-        <th class="px-4 py-2 text-left">Balance</th>
-        <th class="px-4 py-2 text-left">Created</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let bill of bills" class="hover:bg-gray-100 dark:hover:bg-gray-700">
-        <td class="px-4 py-2 text-blue-600 underline flex items-center">
-          <a
-            [routerLink]="['/dashboard/bills', bill.id, 'entries']"
-            class="flex items-center w-full hover:text-blue-800 dark:hover:text-blue-300 focus:outline-none"
-          >
-            <!-- ✅ Replaced HeroChartPie ng-icon with inline SVG -->
-            <svg class="w-5 h-5 mr-1 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
-              <path d="M22 12A10 10 0 0 0 12 2v10z"/>
-            </svg>{{bill.title}}
-          </a>
-        </td>
-        <td class="px-4 py-2">{{bill.bill_month}}</td>
-        <td class="px-4 py-2">₹{{bill.total_balance | number:'1.2-2'}}</td>
-        <td class="px-4 py-2">{{bill.created_at | date:'shortDate'}}</td>
-      </tr>
-    </tbody>
-  </table>
+
+  <div class="overflow-x-auto rounded-lg shadow">
+    <table class="min-w-full divide-y divide-gray-200 bg-white dark:bg-gray-800">
+      <thead class="hidden md:table-header-group">
+        <tr>
+          <th class="px-4 py-2 text-left">Title</th>
+          <th class="px-4 py-2 text-left">Month</th>
+          <th class="px-4 py-2 text-left">Balance</th>
+          <th class="px-4 py-2 text-left">Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let bill of bills" class="hover:bg-gray-100 dark:hover:bg-gray-700 block md:table-row mb-4 md:mb-0 rounded md:rounded-none border md:border-0 border-gray-100 dark:border-gray-700">
+          <td class="px-4 py-2 flex items-center md:table-cell block text-blue-600 underline">
+            <a
+              [routerLink]="['/dashboard/bills', bill.id, 'entries']"
+              class="flex items-center w-full hover:text-blue-800 dark:hover:text-blue-300 focus:outline-none"
+            >
+              <svg class="w-5 h-5 mr-1 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+                <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+              </svg>{{bill.title}}
+            </a>
+          </td>
+          
+          <!-- Mobile label, visible only on small screens -->
+          <td class="px-4 py-2 md:table-cell block text-sm text-gray-500">
+            <span class="md:hidden">Month: </span>{{bill.bill_month}}
+          </td>
+          <td class="px-4 py-2 md:table-cell block text-sm text-gray-500">
+            <span class="md:hidden">Balance: </span>₹{{bill.total_balance | number:'1.2-2'}}
+          </td>
+          <td class="px-4 py-2 md:table-cell block text-sm text-gray-500">
+            <span class="md:hidden">Created: </span>{{bill.created_at | date:'shortDate'}}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
